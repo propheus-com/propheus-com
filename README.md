@@ -1,1 +1,1 @@
-# propheus-web
+# propheus
