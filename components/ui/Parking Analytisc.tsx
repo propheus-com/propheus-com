@@ -192,7 +192,7 @@ const ParkingWidget = ({ direction = 'right', isVisible = true }: { direction?: 
                 <motion.div variants={itemVariants} className="flex justify-between items-start mb-6">
                   <div className="flex items-center gap-2.5">
                     <ParkingIcon />
-                    <h3 className="text-white/90 font-semibold text-lg tracking-tight leading-none">Facility Status</h3>
+                    <h3 className="text-white/90 font-semibold text-lg tracking-tight leading-none">Parking Status</h3>
                   </div>
                   {/* Live Status Badge */}
                   <div className="flex items-center gap-1.5 bg-teal-500/10 border border-teal-500/20 px-2 py-1 rounded shadow-[inset_0_1px_1px_rgba(255,255,255,0.05)]">
@@ -289,7 +289,7 @@ const ParkingWidget = ({ direction = 'right', isVisible = true }: { direction?: 
 };
 
 // --- CARD-ONLY EXPORT — used inside signal-pointer system in HeroExperience ---
-export const ParkingAnalyticsCard = () => {
+export const ParkingAnalyticsCard = ({ isMobile = false }: { isMobile?: boolean }) => {
   const cardVariants = {
     hidden: { opacity: 0, scale: 0.9, filter: "blur(10px)" },
     visible: { opacity: 1, scale: 1, filter: "blur(0px)", transition: { type: "spring" as const, stiffness: 100, damping: 20, when: "beforeChildren" as const, staggerChildren: 0.08 } }
@@ -299,13 +299,31 @@ export const ParkingAnalyticsCard = () => {
     visible: { opacity: 1, x: 0, transition: { duration: 0.5, ease: "easeOut" as const } }
   };
 
+  if (isMobile) {
+    return (
+      <motion.div initial="hidden" animate="visible" variants={cardVariants}>
+        <GlowCard className="p-3">
+          <motion.div variants={itemVariants}>
+            <h3 className="text-white/90 font-semibold text-xs tracking-tight leading-none mb-1.5">Parking</h3>
+            <div className="flex items-baseline gap-1">
+              <span className="text-white font-bold text-2xl leading-[0.9] tracking-tighter drop-shadow-md">
+                <AnimatedCounter value={39} delay={1.0} />
+              </span>
+              <span className="text-white/30 font-medium text-[10px]">/ 86 open</span>
+            </div>
+          </motion.div>
+        </GlowCard>
+      </motion.div>
+    );
+  }
+
   return (
     <motion.div initial="hidden" animate="visible" variants={cardVariants} className="w-[330px]">
       <GlowCard className="p-6">
         <motion.div variants={itemVariants} className="flex justify-between items-start mb-6">
           <div className="flex items-center gap-2.5">
             <ParkingIcon />
-            <h3 className="text-white/90 font-semibold text-lg tracking-tight leading-none">Facility Status</h3>
+            <h3 className="text-white/90 font-semibold text-lg tracking-tight leading-none">Parking Status</h3>
           </div>
           <div className="flex items-center gap-1.5 bg-teal-500/10 border border-teal-500/20 px-2 py-1 rounded shadow-[inset_0_1px_1px_rgba(255,255,255,0.05)]">
             <motion.div animate={{ opacity: [1, 0.4, 1] }} transition={{ duration: 2, repeat: Infinity }} className="w-1.5 h-1.5 rounded-full bg-teal-400" />
@@ -316,15 +334,15 @@ export const ParkingAnalyticsCard = () => {
           <span className="text-white/40 text-[10px] font-bold tracking-[0.2em] uppercase mb-1">Available Spaces</span>
           <div className="flex items-baseline gap-2">
             <span className="text-white font-bold text-[56px] leading-[0.9] tracking-tighter drop-shadow-md">
-              <AnimatedCounter value={39} delay={1.2} />
+              <AnimatedCounter value={39} delay={1.0} />
             </span>
             <span className="text-white/30 font-medium text-[16px]">/ 86</span>
           </div>
         </motion.div>
         <motion.div variants={itemVariants} className="flex flex-col gap-2 mb-6">
           <div className="h-2.5 w-full bg-white/5 rounded-full overflow-hidden flex shadow-inner">
-            <motion.div initial={{ width: 0 }} animate={{ width: '54.6%' }} transition={{ duration: 1.5, ease: "easeOut", delay: 1.5 }} className="bg-white/20 h-full border-r border-[#000]" />
-            <motion.div initial={{ width: 0 }} animate={{ width: '45.4%' }} transition={{ duration: 1.5, ease: "easeOut", delay: 1.5 }} className="bg-teal-400 h-full relative">
+            <motion.div initial={{ width: 0 }} animate={{ width: '54.6%' }} transition={{ duration: 1.5, ease: "easeOut", delay: 1.2 }} className="bg-white/20 h-full border-r border-[#000]" />
+            <motion.div initial={{ width: 0 }} animate={{ width: '45.4%' }} transition={{ duration: 1.5, ease: "easeOut", delay: 1.2 }} className="bg-teal-400 h-full relative">
               <div className="absolute inset-0 bg-gradient-to-r from-transparent to-white/20" />
             </motion.div>
           </div>
@@ -341,7 +359,7 @@ export const ParkingAnalyticsCard = () => {
                 <span className="text-white/70 text-[12px] font-medium tracking-wide group-hover:text-white transition-colors">{level.name}</span>
                 <div className="flex items-center gap-3">
                   <div className="w-16 h-1.5 bg-white/5 rounded-full overflow-hidden shadow-inner">
-                    <motion.div className={`h-full ${level.color}`} initial={{ width: 0 }} animate={{ width: `${level.occ}%` }} transition={{ duration: 1.2, delay: 1.8 + (idx * 0.1), ease: "easeOut" }} />
+                    <motion.div className={`h-full ${level.color}`} initial={{ width: 0 }} animate={{ width: `${level.occ}%` }} transition={{ duration: 1.2, delay: 1.4 + (idx * 0.1), ease: "easeOut" }} />
                   </div>
                   <span className="text-white/90 text-[12px] font-semibold w-5 text-right">{level.available}</span>
                 </div>

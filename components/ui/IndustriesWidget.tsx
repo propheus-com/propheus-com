@@ -74,14 +74,14 @@ const GlowCard = ({ children, className = '' }) => {
     <div
       ref={cardRef}
       style={{
-        '--backdrop': 'rgba(255, 255, 255, 0.98)',
+        '--backdrop': 'rgba(10, 15, 12, 0.85)',
         '--border-size': '1.5px',
         '--spotlight-size': '400px',
-        backgroundImage: `radial-gradient(var(--spotlight-size) var(--spotlight-size) at calc(var(--x, 0) * 1px) calc(var(--y, 0) * 1px), rgba(45, 212, 191, 0.05), transparent)`,
+        backgroundImage: `radial-gradient(var(--spotlight-size) var(--spotlight-size) at calc(var(--x, 0) * 1px) calc(var(--y, 0) * 1px), rgba(45, 212, 191, 0.08), transparent)`,
         backgroundColor: 'var(--backdrop)',
-        border: 'var(--border-size) solid rgba(0, 0, 0, 0.08)',
+        border: 'var(--border-size) solid rgba(255, 255, 255, 0.08)',
       }}
-      className={`rounded-[40px] overflow-hidden backdrop-blur-3xl shadow-[0_20px_60px_-10px_rgba(0,0,0,0.12)] relative ${className}`}
+      className={`rounded-[40px] overflow-hidden backdrop-blur-3xl shadow-[0_20px_60px_-10px_rgba(0,0,0,0.5)] relative ${className}`}
     >
       <div className="relative z-10 w-full h-full">{children}</div>
     </div>
@@ -108,7 +108,7 @@ export default function IndustriesWidget() {
       <div className="relative flex flex-col md:flex-row items-center justify-between w-full max-w-[1400px] h-full mx-auto">
         
         {/* Left Side: Cinematic Background Layer */}
-        <div className="relative w-full md:w-10/12 h-[500px] md:h-[750px] rounded-[48px] overflow-hidden bg-zinc-900 group shadow-2xl">
+        <div className="relative w-full md:w-10/12 h-[300px] md:h-[750px] rounded-[48px] overflow-hidden bg-zinc-900 group shadow-2xl">
           <AnimatePresence mode="wait">
             <motion.div
               key={activePartner.id}
@@ -121,7 +121,7 @@ export default function IndustriesWidget() {
               <img 
                 src={activePartner.image} 
                 alt={activePartner.name}
-                className="w-full h-full object-cover brightness-75"
+                className="w-full h-full object-cover brightness-[0.6]"
               />
               {/* Vignette Overlay */}
               <div className="absolute inset-0 bg-gradient-to-r from-black/40 via-transparent to-black/20" />
@@ -130,23 +130,23 @@ export default function IndustriesWidget() {
         </div>
 
         {/* Right Side: Overlapping Glow Card */}
-        <div className="relative mt-[-80px] md:mt-0 md:absolute md:right-0 w-full md:w-[540px] z-20">
+        <div className="relative mt-[-40px] md:mt-0 md:absolute md:right-0 w-full md:w-[540px] z-20">
           <GlowCard className="p-8 md:p-12 flex flex-col gap-6">
             
             {/* Tabs Navigation (Sliding Pill) */}
-            <nav className="flex items-center gap-2 p-1.5 rounded-full bg-gray-100/80 border border-gray-200 w-fit">
+            <nav className="industries-widget-tabs flex items-center gap-2 p-1.5 rounded-full bg-white/[0.06] border border-white/[0.08] w-fit max-w-full overflow-x-auto">
               {partnerships.map((partner, index) => (
                 <button
                   key={partner.id}
                   onClick={() => setActiveIndex(index)}
                   className={`relative px-5 py-2 text-[12px] font-bold uppercase tracking-[0.15em] transition-colors duration-300 z-10 ${
-                    activeIndex === index ? 'text-gray-900' : 'text-gray-400 hover:text-gray-600'
+                    activeIndex === index ? 'text-white' : 'text-gray-500 hover:text-gray-300'
                   }`}
                 >
                   {activeIndex === index && (
                     <motion.div
                       layoutId="industry-pill"
-                      className="absolute inset-0 bg-white rounded-full shadow-sm"
+                      className="absolute inset-0 bg-white/[0.1] rounded-full shadow-sm"
                       transition={{ type: 'spring', stiffness: 300, damping: 30 }}
                     />
                   )}
@@ -166,19 +166,19 @@ export default function IndustriesWidget() {
                   transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
                   className="flex flex-col"
                 >
-                  <p className="text-xl md:text-[26px] leading-[1.3] font-medium tracking-tight text-gray-800 mt-10">
+                  <p className="text-xl md:text-[26px] leading-[1.3] font-medium tracking-tight text-gray-200 mt-10">
                     {activePartner.quote}
                   </p>
                 </motion.div>
               </AnimatePresence>
 
               {/* Bottom Footer: Progress Ring & CTA */}
-              <div className="flex items-center justify-between pt-6 border-t border-gray-200">
+              <div className="flex items-center justify-between pt-6 border-t border-white/10">
                 
                 {/* Circular Icon Ring */}
-                <div className="relative w-16 h-16 md:w-20 md:h-20 flex items-center justify-center">
+                <div className="relative w-12 h-12 md:w-16 md:h-16 lg:w-20 lg:h-20 flex items-center justify-center">
                   <svg className="absolute inset-0 w-full h-full -rotate-90" viewBox="0 0 80 80">
-                    <circle cx="40" cy="40" r="38" stroke="rgba(0,0,0,0.06)" strokeWidth="1.5" fill="none" />
+                    <circle cx="40" cy="40" r="38" stroke="rgba(255,255,255,0.08)" strokeWidth="1.5" fill="none" />
                     <motion.circle 
                       cx="40" cy="40" r="38" 
                       stroke={activePartner.accent} 
@@ -191,16 +191,17 @@ export default function IndustriesWidget() {
                       transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
                     />
                   </svg>
-                  <div className="text-gray-600 transition-transform duration-500 hover:scale-110">
+                  <div className="text-gray-300 transition-transform duration-500 hover:scale-110">
                     <Icon size={28} strokeWidth={1.5} />
                   </div>
                 </div>
 
                 {/* CTA Button (Signature Hover Physics) */}
-                <motion.button
+                <motion.a
+                  href={`/industries#${activePartner.id}`}
                   whileHover="hover"
                   whileTap="tap"
-                  className="group flex items-center gap-2 bg-gray-900 text-white px-8 py-4 rounded-full text-[13px] font-black uppercase tracking-[0.1em] shadow-[0_0_20px_rgba(0,0,0,0.08)] hover:bg-gray-800 transition-colors"
+                  className="group flex items-center gap-1.5 md:gap-2 bg-white/[0.1] text-white px-3 py-2 md:px-5 md:py-3 lg:px-8 lg:py-4 rounded-full text-[10px] md:text-[12px] lg:text-[13px] font-black uppercase tracking-[0.1em] shadow-[0_0_20px_rgba(0,0,0,0.2)] hover:bg-white/[0.15] transition-colors no-underline border border-white/[0.08]"
                 >
                   <span>See the details</span>
                   <motion.div
@@ -212,7 +213,7 @@ export default function IndustriesWidget() {
                   >
                     <ArrowRight size={16} strokeWidth={3} />
                   </motion.div>
-                </motion.button>
+                </motion.a>
               </div>
             </div>
 

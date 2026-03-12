@@ -1,6 +1,6 @@
 'use client';
 import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { motion } from 'motion/react';
 import { cn } from '@/lib/cn';
 
 type Direction = 'TOP' | 'LEFT' | 'BOTTOM' | 'RIGHT';
@@ -55,19 +55,22 @@ export function HoverBorderGradient({
         return () => clearInterval(interval);
     }, [hovered, duration, clockwise]);
 
+    // Cast to a permissive component type so TS accepts event-handler props + children
+    const AnyTag = Tag as React.FC<React.HTMLAttributes<HTMLElement> & { children?: React.ReactNode }>;
+
     return (
-        <Tag
+        <AnyTag
             onMouseEnter={() => setHovered(true)}
             onMouseLeave={() => setHovered(false)}
             className={cn(
                 'relative flex rounded-full content-center bg-black/20 hover:bg-black/10 transition duration-500 items-center flex-col flex-nowrap h-min justify-center overflow-visible p-px w-fit',
                 containerClassName
             )}
-            {...props}
+            {...(props as React.HTMLAttributes<HTMLElement>)}
         >
             <div
                 className={cn(
-                    'w-auto z-10 bg-black px-6 py-3 rounded-[inherit]',
+                    'w-auto z-20 bg-black text-white px-6 py-3 rounded-[inherit]',
                     className
                 )}
             >
@@ -89,6 +92,6 @@ export function HoverBorderGradient({
 
             {/* Inner black fill — leaves only the border strip visible */}
             <div className="bg-black absolute z-[1] flex-none inset-[2px] rounded-[100px]" />
-        </Tag>
+        </AnyTag>
     );
 }

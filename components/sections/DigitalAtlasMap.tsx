@@ -2,6 +2,7 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence, animate } from 'framer-motion';
+import useIsMobile from '@/hooks/useIsMobile';
 
 /**
  * Digital Atlas — Interactive location intelligence map.
@@ -133,34 +134,34 @@ const TelemetryBar = ({
     </div>
 );
 
-const GlassPanel = ({ children }: { children: React.ReactNode }) => {
-    const panelRef = useRef<HTMLDivElement>(null);
-    useEffect(() => {
-        const syncPointer = (e: PointerEvent) => {
-            if (panelRef.current) {
-                const rect = panelRef.current.getBoundingClientRect();
-                panelRef.current.style.setProperty('--x', (e.clientX - rect.left).toFixed(2));
-                panelRef.current.style.setProperty('--y', (e.clientY - rect.top).toFixed(2));
-            }
-        };
-        window.addEventListener('pointermove', syncPointer);
-        return () => window.removeEventListener('pointermove', syncPointer);
-    }, []);
+const GlassPanelInner = ({ children: panelChildren, isMobile = false }: { children: React.ReactNode; isMobile?: boolean }) => {
+        const panelRef = useRef<HTMLDivElement>(null);
+        useEffect(() => {
+            const syncPointer = (e: PointerEvent) => {
+                if (panelRef.current) {
+                    const rect = panelRef.current.getBoundingClientRect();
+                    panelRef.current.style.setProperty('--x', (e.clientX - rect.left).toFixed(2));
+                    panelRef.current.style.setProperty('--y', (e.clientY - rect.top).toFixed(2));
+                }
+            };
+            window.addEventListener('pointermove', syncPointer);
+            return () => window.removeEventListener('pointermove', syncPointer);
+        }, []);
 
-    return (
-        <motion.div
-            ref={panelRef}
-            initial={{ x: '110%', opacity: 0 }}
-            animate={{ x: 0, opacity: 1 }}
-            transition={{ type: 'spring', stiffness: 180, damping: 24, delay: 0.4 }}
-            style={{
-                backgroundImage: `radial-gradient(450px 450px at calc(var(--x, 0) * 1px) calc(var(--y, 0) * 1px), rgba(45, 212, 191, 0.08), transparent)`,
-                backgroundColor: 'rgba(0, 0, 0, 0.98)',
-                border: '2px solid rgba(255, 255, 255, 0.12)',
-            }}
-            className="absolute top-6 right-6 bottom-6 w-[420px] z-[2000] rounded-[44px] backdrop-blur-3xl shadow-[0_50px_120px_-30px_rgba(0,0,0,1)] flex flex-col overflow-hidden"
-        >
-            <div className="relative z-10 flex flex-col h-full no-scrollbar overflow-y-auto">{children}</div>
+        return (
+            <motion.div
+                ref={panelRef}
+                initial={isMobile ? { y: 40, opacity: 0 } : { x: '110%', opacity: 0 }}
+                animate={isMobile ? { y: 0, opacity: 1 } : { x: 0, opacity: 1 }}
+                transition={{ type: 'spring', stiffness: 180, damping: 24, delay: 0.4 }}
+                style={{
+                    backgroundImage: `radial-gradient(450px 450px at calc(var(--x, 0) * 1px) calc(var(--y, 0) * 1px), rgba(45, 212, 191, 0.08), transparent)`,
+                    backgroundColor: 'rgba(0, 0, 0, 0.98)',
+                    border: '2px solid rgba(255, 255, 255, 0.12)',
+                }}
+                className="atlas-glass-panel absolute top-6 right-6 bottom-6 w-[420px] z-[2000] rounded-[44px] backdrop-blur-3xl shadow-[0_50px_120px_-30px_rgba(0,0,0,1)] flex flex-col overflow-hidden"
+            >
+                <div className="relative z-10 flex flex-col h-full no-scrollbar overflow-y-auto">{panelChildren}</div>
         </motion.div>
     );
 };
@@ -173,6 +174,7 @@ export default function DigitalAtlas() {
     const lRef = useRef<any>(null);
     const layersRef = useRef<{ overview: any; spider: any }>({ overview: null, spider: null });
     const [activeStore, setActiveStore] = useState<LocationData | null>(null);
+    const isMobile = useIsMobile();
 
     useEffect(() => {
         if (typeof window === 'undefined') return;
@@ -237,7 +239,7 @@ export default function DigitalAtlas() {
         layersRef.current.overview.clearLayers();
         locationsData.forEach(store => {
             const marker = L.marker([store.lat, store.lng], {
-                icon: createDivIcon(L, '#2dd4bf', false, 0, true),
+                icon: createDivIcon(L, '#008a89', false, 0, true),
                 zIndexOffset: 500, // overview markers always above satellite labels
             }).addTo(layersRef.current.overview);
             marker.bindTooltip(`<span class="map-tooltip-pro">${store.name}</span>`, {
@@ -266,10 +268,12 @@ export default function DigitalAtlas() {
     const triggerSpiderView = (store: LocationData, L: any, map: any) => {
         setActiveStore(store);
         layersRef.current.spider.clearLayers();
-        // Remove overview layer while spider is active — prevents double pulsing
-        // and the visual overlap of two markers at the same coordinate.
-        if (map.hasLayer(layersRef.current.overview)) {
-            layersRef.current.overview.removeFrom(map);
+        // Dim overview markers but keep them visible — add a CSS class rather than removing
+        const overviewEl = layersRef.current.overview._container || layersRef.current.overview.getContainer?.();
+        if (overviewEl) {
+            overviewEl.style.opacity = '0.35';
+            overviewEl.style.transition = 'opacity 0.4s ease';
+            overviewEl.style.pointerEvents = 'none';
         }
         if (!map.hasLayer(layersRef.current.spider)) {
             layersRef.current.spider.addTo(map);
@@ -316,13 +320,18 @@ export default function DigitalAtlas() {
         setActiveStore(null);
         if (mapInstance.current) {
             layersRef.current.spider.removeFrom(mapInstance.current);
-            layersRef.current.overview.addTo(mapInstance.current);
+            // Restore overview markers to full visibility
+            const overviewEl = layersRef.current.overview._container || layersRef.current.overview.getContainer?.();
+            if (overviewEl) {
+                overviewEl.style.opacity = '1';
+                overviewEl.style.pointerEvents = 'auto';
+            }
             mapInstance.current.panTo([40.7535, -74.0012], { animate: true, duration: 1.2 });
         }
     };
 
     return (
-        <div className="relative w-full aspect-video bg-[#010101] rounded-[44px] overflow-hidden border border-white/10 atlas-typography shadow-[0_60px_140px_-40px_rgba(0,0,0,1)]">
+        <div className={`relative w-full bg-[#010101] ${isMobile ? 'flex flex-col rounded-[24px]' : 'aspect-video rounded-[44px]'} overflow-hidden border border-white/10 atlas-typography shadow-[0_60px_140px_-40px_rgba(0,0,0,1)]`}>
             {/* eslint-disable-next-line @next/next/no-css-tags */}
             <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 
@@ -356,8 +365,8 @@ export default function DigitalAtlas() {
                 /* Center marker: bloom in prominently on click, then pulse slowly */
                 .is-center { animation: center-bloom 0.55s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
                 @keyframes center-bloom { 0% { transform: scale(0.2); opacity: 0; } 60% { transform: scale(1.25); opacity: 1; } 100% { transform: scale(1); opacity: 1; } }
-                .is-center .marker-core { width: 30px; height: 30px; background: #fff; box-shadow: 0 0 60px #2dd4bf, 0 0 20px rgba(45,212,191,0.5); border: none; }
-                .is-center .marker-ring { border-color: #2dd4bf; border-width: 2px; opacity: 1; animation: map-pulse 3.5s infinite cubic-bezier(0.15, 0, 0, 1); }
+                .is-center .marker-core { width: 30px; height: 30px; background: #fff; box-shadow: 0 0 60px #008a89, 0 0 20px rgba(0,138,137,0.5); border: none; }
+                .is-center .marker-ring { border-color: #008a89; border-width: 2px; opacity: 1; animation: map-pulse 3.5s infinite cubic-bezier(0.15, 0, 0, 1); }
                 @keyframes map-pulse { 0% { transform: scale(0.1); opacity: 1; } 100% { transform: scale(4.5); opacity: 0; } }
 
                 .spider-line-instant-flow {
@@ -413,59 +422,97 @@ export default function DigitalAtlas() {
 
                 .no-scrollbar::-webkit-scrollbar { display: none; }
                 .atlas-typography { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; -webkit-font-smoothing: antialiased; }
+
+                /* Idle panel shimmer border */
+                .atlas-idle-panel {
+                    position: relative;
+                }
+                .atlas-idle-panel::before {
+                    content: '';
+                    position: absolute;
+                    inset: -1px;
+                    border-radius: 36px;
+                    padding: 2px;
+                    background: linear-gradient(135deg, transparent 20%, rgba(0,138,137,0.3) 40%, rgba(0,138,137,0.6) 50%, rgba(0,138,137,0.3) 60%, transparent 80%);
+                    background-size: 200% 200%;
+                    animation: atlas-shimmer 3s ease-in-out infinite;
+                    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+                    -webkit-mask-composite: xor;
+                    mask-composite: exclude;
+                    pointer-events: none;
+                    z-index: 100;
+                }
+                @keyframes atlas-shimmer {
+                    0%   { background-position: 200% 200%; }
+                    50%  { background-position: 0% 0%; }
+                    100% { background-position: 200% 200%; }
+                }
             `}</style>
 
             {/* Map surface */}
-            <div ref={mapContainerRef} className="absolute inset-0 z-0 grayscale-[0.65] brightness-[0.7]" />
+            <div ref={mapContainerRef} className={`${isMobile ? 'relative w-full h-[280px]' : 'absolute inset-0'} z-0 grayscale-[0.65] brightness-[0.7]`} />
 
             {/* Details panel — always visible */}
-            <GlassPanel>
+            <GlassPanelInner isMobile={isMobile}>
                 {!activeStore ? (
-                    <div className="flex flex-col items-center justify-center h-full gap-6 px-10 text-center select-none">
-                        {/* Map-pin tap-to-interact icon */}
+                    <div className="flex flex-col items-center justify-center h-full gap-6 px-10 text-center select-none atlas-idle-panel">
+                        {/* Animated tapping hand + map pin */}
                         <motion.div
                             animate={{ y: [0, -8, 0] }}
                             transition={{ repeat: Infinity, duration: 2.2, ease: 'easeInOut' }}
+                            className="relative"
                         >
                             <svg width="56" height="76" viewBox="0 0 56 76" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 {/* Shadow ellipse under pin */}
                                 <ellipse cx="28" cy="68" rx="10" ry="4"
-                                    fill="rgba(45,212,191,0.12)"
+                                    fill="rgba(0,138,137,0.12)"
                                 />
                                 {/* Ripple rings from shadow */}
                                 <motion.ellipse
                                     cx="28" cy="68" rx="10" ry="4"
-                                    stroke="rgba(45,212,191,0.35)" strokeWidth="1"
+                                    stroke="rgba(0,138,137,0.35)" strokeWidth="1"
                                     animate={{ rx: [10, 22], ry: [4, 9], opacity: [0.55, 0] }}
                                     transition={{ repeat: Infinity, duration: 2.2, ease: 'easeOut', delay: 0.4 }}
                                 />
                                 <motion.ellipse
                                     cx="28" cy="68" rx="6" ry="2.5"
-                                    stroke="rgba(45,212,191,0.5)" strokeWidth="1"
+                                    stroke="rgba(0,138,137,0.5)" strokeWidth="1"
                                     animate={{ rx: [6, 16], ry: [2.5, 6.5], opacity: [0.65, 0] }}
                                     transition={{ repeat: Infinity, duration: 2.2, ease: 'easeOut' }}
                                 />
                                 {/* Pin body — teardrop */}
                                 <path
                                     d="M28 4C18.6 4 11 11.6 11 21c0 13.5 17 43 17 43s17-29.5 17-43C45 11.6 37.4 4 28 4z"
-                                    fill="rgba(45,212,191,0.10)"
-                                    stroke="rgba(45,212,191,0.55)"
+                                    fill="rgba(0,138,137,0.10)"
+                                    stroke="rgba(0,138,137,0.55)"
                                     strokeWidth="1.5"
                                     strokeLinejoin="round"
                                 />
                                 {/* Inner glow ring */}
                                 <circle cx="28" cy="21" r="9"
-                                    fill="rgba(45,212,191,0.15)"
-                                    stroke="rgba(45,212,191,0.4)"
+                                    fill="rgba(0,138,137,0.15)"
+                                    stroke="rgba(0,138,137,0.4)"
                                     strokeWidth="1"
                                 />
                                 {/* Center dot */}
                                 <circle cx="28" cy="21" r="4.5"
-                                    fill="rgba(45,212,191,0.9)"
+                                    fill="rgba(0,138,137,0.9)"
                                 />
                             </svg>
+                            {/* Tapping hand icon */}
+                            <motion.svg
+                                width="24" height="24" viewBox="0 0 24 24" fill="none"
+                                className="absolute -bottom-1 -right-2"
+                                animate={{ y: [0, 4, 0], scale: [1, 0.92, 1] }}
+                                transition={{ repeat: Infinity, duration: 1.6, ease: 'easeInOut', delay: 0.6 }}
+                            >
+                                <path d="M8 13V4.5a1.5 1.5 0 0 1 3 0V12" stroke="rgba(0,138,137,0.7)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                                <path d="M11 11.5V10a1.5 1.5 0 0 1 3 0v1.5" stroke="rgba(0,138,137,0.7)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                                <path d="M14 12V10.5a1.5 1.5 0 0 1 3 0V12" stroke="rgba(0,138,137,0.7)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                                <path d="M17 12V11.5a1.5 1.5 0 0 1 3 0V16a6 6 0 0 1-6 6H12a6 6 0 0 1-5.21-3l-1.3-2.24A1.5 1.5 0 0 1 7 14.5" stroke="rgba(0,138,137,0.7)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                            </motion.svg>
                         </motion.div>
-                        <p className="text-white/40 text-[14px] leading-relaxed font-semibold tracking-tight max-w-[200px]">
+                        <p className="text-white/70 text-[14px] leading-relaxed font-semibold tracking-tight max-w-[220px]">
                             Tap any location to reveal its market intelligence
                         </p>
                     </div>
@@ -474,7 +521,7 @@ export default function DigitalAtlas() {
                     <div className="flex flex-col gap-1.5 mb-6">
                         <h2 className="text-white font-black text-[30px] tracking-tight leading-none">{activeStore.name}</h2>
                         <div className="flex items-center gap-2 mt-2">
-                            <span className="px-2.5 py-1 rounded-md bg-teal-500/10 border border-teal-500/30 text-teal-400 font-bold text-[10px] uppercase tracking-widest leading-none">{activeStore.type}</span>
+                            <span className="px-2.5 py-1 rounded-md font-bold text-[10px] uppercase tracking-widest leading-none" style={{ background: 'rgba(0,138,137,0.1)', border: '1px solid rgba(0,138,137,0.3)', color: '#008a89' }}>{activeStore.type}</span>
                             <span className="px-2.5 py-1 rounded-md bg-white/5 border border-white/10 text-white/40 font-bold text-[10px] uppercase tracking-widest leading-none">{activeStore.density}</span>
                         </div>
                     </div>
@@ -529,7 +576,7 @@ export default function DigitalAtlas() {
                         return (
                             <div className="mt-auto pt-5 border-t border-white/[0.06]">
                                 <span className="text-[8px] font-black uppercase tracking-[0.4em] text-white/20 block mb-4">AI Assessment</span>
-                                <p className="text-teal-400 font-black text-[20px] leading-none tracking-tight mb-2">{verdict.label}</p>
+                                <p className="font-black text-[20px] leading-none tracking-tight mb-2" style={{ color: '#008a89' }}>{verdict.label}</p>
                                 <p className="text-white/35 text-[12px] leading-relaxed">{verdict.copy}</p>
                             </div>
                         );
@@ -537,7 +584,7 @@ export default function DigitalAtlas() {
                     <div className="h-2 shrink-0" />
                 </div>
                 )}
-            </GlassPanel>
+            </GlassPanelInner>
 
             {/* Guidance capsule */}
             <AnimatePresence>
@@ -554,11 +601,12 @@ export default function DigitalAtlas() {
                                 <motion.div
                                     animate={{ scale: [1, 2.4, 1], opacity: [0.7, 0, 0.7] }}
                                     transition={{ repeat: Infinity, duration: 2.4, ease: 'easeInOut' }}
-                                    className="absolute inset-0 rounded-full bg-teal-400"
+                                    className="absolute inset-0 rounded-full"
+                                    style={{ background: '#008a89' }}
                                 />
-                                <div className="w-2 h-2 rounded-full bg-teal-400 shadow-[0_0_8px_#2dd4bf] z-10" />
+                                <div className="w-2 h-2 rounded-full z-10" style={{ background: '#008a89', boxShadow: '0 0 8px rgba(0,138,137,0.6)' }} />
                             </div>
-                            <span className="text-white/70 text-[13px] font-semibold tracking-wide">Click a location to reveal its market intelligence</span>
+                            <span className={`text-white/70 ${isMobile ? 'text-[11px]' : 'text-[13px]'} font-semibold tracking-wide`}>{isMobile ? 'Tap' : 'Click'} a location to reveal its market intelligence</span>
                         </div>
                     </motion.div>
                 )}

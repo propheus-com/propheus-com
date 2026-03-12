@@ -175,12 +175,12 @@ const EventsCompetitorSentimentWidget = () => {
   return (
     <AnimatePresence>
     {isVisible && (
-    <div style={{ transform: `scale(${MI_SCALE})`, transformOrigin: 'top left', display: 'inline-block' }}>
+    <div style={{ transform: `scale(${MI_SCALE})`, transformOrigin: 'center right', display: 'inline-block' }}>
     <motion.div
       key={playKey}
-      initial={{ opacity: 0, y: 14, filter: 'blur(12px)' }}
-      animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-      exit={{ opacity: 0, y: 14, filter: 'blur(12px)', transition: { duration: 0.4, ease: 'easeIn' } }}
+      initial={{ opacity: 0, filter: 'blur(12px)' }}
+      animate={{ opacity: 1, filter: 'blur(0px)' }}
+      exit={{ opacity: 0, filter: 'blur(12px)', transition: { duration: 0.4, ease: 'easeIn' } }}
       transition={{ duration: 1.0, delay: 2.0, ease: [0.22, 1, 0.36, 1] }}
       className="w-full max-w-[460px] apple-typography select-none p-2"
     >
@@ -332,6 +332,53 @@ const EventsCompetitorSentimentWidget = () => {
 };
 
 export { EventsCompetitorSentimentWidget };
+
+/* ── Compact mobile variant — shows key stats only ── */
+export function MobileMarketIntel() {
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    const onEnter = () => setIsVisible(true);
+    const onExit  = () => setIsVisible(false);
+    window.addEventListener('propheus:state2',      onEnter);
+    window.addEventListener('propheus:state2:exit', onExit);
+    return () => {
+      window.removeEventListener('propheus:state2',      onEnter);
+      window.removeEventListener('propheus:state2:exit', onExit);
+    };
+  }, []);
+
+  if (!isVisible) return null;
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, filter: 'blur(8px)' }}
+      animate={{ opacity: 1, filter: 'blur(0px)' }}
+      transition={{ duration: 0.8, delay: 2.0, ease: [0.22, 1, 0.36, 1] }}
+    >
+      <GlowCard className="p-3">
+        <div style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "Inter", sans-serif', WebkitFontSmoothing: 'antialiased' }}>
+          <h3 style={{ color: 'rgba(255,255,255,0.9)', fontWeight: 600, fontSize: 12, letterSpacing: '-0.02em', lineHeight: 1, margin: '0 0 8px' }}>Market Intel</h3>
+          <div style={{ display: 'flex', gap: 12, alignItems: 'flex-start' }}>
+            <div>
+              <div style={{ color: '#2dd4bf', fontWeight: 700, fontSize: 20, lineHeight: 1, letterSpacing: '-0.04em' }}>
+                <AnimatedCounter value={3} delay={2.2} />
+              </div>
+              <div style={{ color: 'rgba(255,255,255,0.4)', fontSize: 7, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.15em', marginTop: 2 }}>Events</div>
+            </div>
+            <div style={{ width: 1, background: 'rgba(255,255,255,0.08)', alignSelf: 'stretch', minHeight: 28 }} />
+            <div>
+              <div style={{ color: '#3b82f6', fontWeight: 700, fontSize: 20, lineHeight: 1, letterSpacing: '-0.04em' }}>
+                <AnimatedCounter value={78} delay={2.4} />
+              </div>
+              <div style={{ color: 'rgba(255,255,255,0.4)', fontSize: 7, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.15em', marginTop: 2 }}>Sentiment</div>
+            </div>
+          </div>
+        </div>
+      </GlowCard>
+    </motion.div>
+  );
+}
 
 export default function App() {
   return (

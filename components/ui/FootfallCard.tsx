@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 /**
  * FootfallCard — GlowCard Edition
@@ -42,18 +42,19 @@ const ClockIcon = () => (
 );
 
 // --- AnimatedCounter ---
-function AnimatedCounter({ value }: { value: number }) {
+function AnimatedCounter({ value, delay = 0 }: { value: number; delay?: number }) {
   const nodeRef = useRef<HTMLSpanElement>(null);
   useEffect(() => {
     const node = nodeRef.current;
     if (!node) return;
     const controls = animate(0, value, {
       duration: 2.5,
+      delay: delay,
       ease: 'easeOut',
       onUpdate(v) { node.textContent = Math.round(v).toLocaleString(); },
     });
     return () => controls.stop();
-  }, [value]);
+  }, [value, delay]);
   return <span ref={nodeRef} className="footfall-count" />;
 }
 
@@ -122,7 +123,21 @@ const STATS = [
 ];
 
 // --- Main Export ---
-export default function FootfallCard() {
+export default function FootfallCard({ isMobile = false }: { isMobile?: boolean }) {
+  if (isMobile) {
+    return (
+      <GlowCard className="p-3">
+        <h3 className="text-white/90 font-semibold text-xs tracking-tight leading-none mb-1.5">Footfall</h3>
+        <div className="flex items-baseline gap-1">
+          <span className="text-white font-bold text-2xl leading-[0.9] tracking-tighter">
+            <AnimatedCounter value={920} delay={1.0} />
+          </span>
+          <span className="text-white/40 font-medium text-[9px]">visitors/hr</span>
+        </div>
+      </GlowCard>
+    );
+  }
+
   return (
     <GlowCard className="p-6">
       {/* Header */}
@@ -137,7 +152,7 @@ export default function FootfallCard() {
         <div className="flex flex-col">
           <div className="flex items-baseline gap-1.5 mb-6">
             <span className="text-white font-bold text-[56px] leading-[0.9] tracking-tighter">
-              <AnimatedCounter value={920} />
+              <AnimatedCounter value={920} delay={1.0} />
             </span>
             <span className="text-white/40 font-medium text-[13px] tracking-wide">visitors/hr</span>
           </div>

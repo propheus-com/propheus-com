@@ -73,7 +73,7 @@ export interface WeatherWidgetProps {
     className?: string;
 }
 
-export default function WeatherWidget({ temperature = 18 }: WeatherWidgetProps) {
+export default function WeatherWidget({ temperature = 18, isMobile = false }: WeatherWidgetProps & { isMobile?: boolean }) {
     const displayTemp = useCyclingTemp(temperature);
 
     const [isVisible, setIsVisible] = useState(false);
@@ -108,14 +108,56 @@ export default function WeatherWidget({ temperature = 18 }: WeatherWidgetProps) 
         WebkitFontSmoothing: 'antialiased',
     };
 
+    if (isMobile) {
+        return (
+            <AnimatePresence>
+              {isVisible && (
+                <motion.div
+                  key={playKey}
+                  initial={{ opacity: 0, filter: 'blur(10px)' }}
+                  animate={{ opacity: 1, filter: 'blur(0px)' }}
+                  exit={{ opacity: 0, filter: 'blur(10px)' }}
+                  transition={{ duration: 0.85, delay: entryDelay, ease: [0.22, 1, 0.36, 1] }}
+                >
+                    <GlowCard style={{ padding: '0.45rem 0.65rem' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                            <motion.div
+                                animate={{ rotate: 360 }}
+                                transition={{ duration: 12, repeat: Infinity, ease: 'linear' }}
+                                style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                            >
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"
+                                    style={{ width: 26, height: 26, color: '#FBBF24', filter: 'drop-shadow(0 0 8px rgba(251,191,36,0.55))' }}>
+                                    <circle cx="12" cy="12" r="5" fill="currentColor" fillOpacity="0.18" />
+                                    <path d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32 1.41 1.41M2 12h2m16 0h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41" strokeLinecap="round" />
+                                </svg>
+                            </motion.div>
+                            <div style={{ display: 'flex', alignItems: 'flex-start' }}>
+                                <motion.span
+                                    key={displayTemp}
+                                    initial={{ opacity: 0, y: -4 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ duration: 0.3, ease: 'easeOut' }}
+                                    style={{ color: '#fff', fontWeight: 700, fontSize: 22, lineHeight: 1, letterSpacing: '-0.04em', ...sf }}
+                                >{displayTemp}</motion.span>
+                                <span style={{ color: 'rgba(255,255,255,0.55)', fontWeight: 500, fontSize: 11, marginTop: 1, ...sf }}>°</span>
+                            </div>
+                        </div>
+                    </GlowCard>
+                </motion.div>
+              )}
+            </AnimatePresence>
+        );
+    }
+
     return (
         <AnimatePresence>
           {isVisible && (
             <motion.div
               key={playKey}
-              initial={{ opacity: 0, y: -14, filter: 'blur(10px)' }}
-              animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-              exit={{ opacity: 0, y: -14, filter: 'blur(10px)' }}
+              initial={{ opacity: 0, filter: 'blur(10px)' }}
+              animate={{ opacity: 1, filter: 'blur(0px)' }}
+              exit={{ opacity: 0, filter: 'blur(10px)' }}
               transition={{ duration: 0.85, delay: entryDelay, ease: [0.22, 1, 0.36, 1] }}
             >
         <GlowCard style={{ padding: '1.1rem 1.25rem' }}>

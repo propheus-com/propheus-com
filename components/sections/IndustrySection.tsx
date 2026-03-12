@@ -4,6 +4,7 @@ import { useEffect, useRef } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import IndustriesWidget from '@/components/ui/IndustriesWidget';
+import LightPillar from '@/components/ui/LightPillar';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -30,6 +31,17 @@ export default function IndustrySection() {
 
     useEffect(() => {
         const ctx = gsap.context(() => {
+            // Section wrapper — fades and rises into view
+            gsap.from(sectionRef.current, {
+                opacity: 0, y: 40,
+                scrollTrigger: {
+                    trigger: sectionRef.current,
+                    start: 'top 90%',
+                    end: 'top 68%',
+                    scrub: 0.8,
+                },
+            });
+
             const line1Words = line1Ref.current?.querySelectorAll('.line1-word');
             const line2Words = line2Ref.current?.querySelectorAll('.line2-word');
 
@@ -85,23 +97,29 @@ export default function IndustrySection() {
         <section
             ref={sectionRef}
             style={{
-                background: '#fafafa',
+                background: '#070d0b',
                 paddingTop: 'clamp(100px, 12vw, 160px)',
                 position: 'relative',
                 overflow: 'hidden',
             }}
         >
-            {/* Subtle noise texture overlay */}
-            <div
-                aria-hidden="true"
-                style={{
-                    position: 'absolute',
-                    inset: 0,
-                    backgroundImage:
-                        'radial-gradient(ellipse 80% 50% at 50% 0%, rgba(45,212,191,0.06) 0%, transparent 70%)',
-                    pointerEvents: 'none',
-                }}
-            />
+            {/* LightPillar background */}
+            <div aria-hidden="true" style={{ position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 0 }}>
+                <LightPillar
+                    topColor="#1cd2b3"
+                    bottomColor="#000000"
+                    intensity={0.8}
+                    rotationSpeed={0.3}
+                    glowAmount={0.002}
+                    pillarWidth={3}
+                    pillarHeight={0.4}
+                    noiseIntensity={0.5}
+                    pillarRotation={25}
+                    interactive={false}
+                    mixBlendMode="screen"
+                    quality="medium"
+                />
+            </div>
 
             {/* ── Section header ── */}
             <div
@@ -125,7 +143,7 @@ export default function IndustrySection() {
                         fontWeight: 700,
                         letterSpacing: '0.2em',
                         textTransform: 'uppercase',
-                        color: '#2dd4bf',
+                        color: '#008a89',
                         marginBottom: '24px',
                     }}
                 >
@@ -135,8 +153,8 @@ export default function IndustrySection() {
                             width: '6px',
                             height: '6px',
                             borderRadius: '50%',
-                            background: '#2dd4bf',
-                            boxShadow: '0 0 10px rgba(45,212,191,0.5)',
+                            background: '#008a89',
+                            boxShadow: '0 0 10px rgba(0,138,137,0.5)',
                         }}
                     />
                     Physical AI Platform
@@ -148,7 +166,7 @@ export default function IndustrySection() {
                         fontWeight: 800,
                         letterSpacing: '-0.04em',
                         lineHeight: 1.05,
-                        color: '#111111',
+                        color: '#f5f5f5',
                         margin: '0 0 24px',
                     }}
                 >
@@ -163,7 +181,7 @@ export default function IndustrySection() {
                         style={{
                             display: 'block',
                             fontSize: 'clamp(1.6rem, 3vw, 2.6rem)',
-                            color: '#999999',
+                            color: 'rgba(255,255,255,0.32)',
                             whiteSpace: 'nowrap',
                         }}
                     >
@@ -176,7 +194,7 @@ export default function IndustrySection() {
                     style={{
                         fontFamily: 'var(--font-body)',
                         fontSize: 'clamp(0.95rem, 1.4vw, 1.1rem)',
-                        color: '#666666',
+                        color: 'rgba(255,255,255,0.5)',
                         lineHeight: 1.7,
                         letterSpacing: '-0.01em',
                         maxWidth: '540px',

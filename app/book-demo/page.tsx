@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import Navbar from '@/components/Navbar';
 import Image from 'next/image';
@@ -21,39 +21,47 @@ declare global {
 }
 
 export default function BookDemoPage() {
-    const formMounted = useRef(false);
+    const [activeTab, setActiveTab] = useState<'demo' | 'report'>('demo');
 
     useEffect(() => {
         document.body.classList.add('lenis-revealed');
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('tab') === 'report') {
+            setActiveTab('report');
+        }
     }, []);
 
     useEffect(() => {
-        if (formMounted.current) return;
-        formMounted.current = true;
+        const renderForm = () => {
+            const targetDiv = document.getElementById('hs-form-target');
+            if (targetDiv) targetDiv.innerHTML = ''; // prevent duplicate forms on swap
 
-        const existing = document.getElementById('hs-embed-script');
-        if (existing) {
-            mountForm();
-            return;
-        }
-
-        const script = document.createElement('script');
-        script.id = 'hs-embed-script';
-        script.src = '//js-na2.hsforms.net/forms/embed/v2.js';
-        script.charset = 'utf-8';
-        script.type = 'text/javascript';
-        script.onload = mountForm;
-        document.head.appendChild(script);
-
-        function mountForm() {
             window.hbspt?.forms.create({
                 region: 'na2',
                 portalId: '242333258',
-                formId: '4a9b1d84-e1fe-43fc-a57e-61f7c09fa64d',
+                formId: activeTab === 'demo' ? '4a9b1d84-e1fe-43fc-a57e-61f7c09fa64d' : 'a11257e4-2b46-4806-afb0-ba0de41b33a7',
                 target: '#hs-form-target',
             });
+        };
+
+        const existingScript = document.getElementById('hs-embed-script');
+        if (!existingScript) {
+            const script = document.createElement('script');
+            script.id = 'hs-embed-script';
+            script.src = '//js-na2.hsforms.net/forms/embed/v2.js';
+            script.charset = 'utf-8';
+            script.type = 'text/javascript';
+            script.onload = renderForm;
+            document.head.appendChild(script);
+        } else {
+            if (window.hbspt) {
+                renderForm();
+            } else {
+                // If script exists but hbspt isn't ready yet (rare race condition)
+                existingScript.addEventListener('load', renderForm);
+            }
         }
-    }, []);
+    }, [activeTab]);
 
     return (
         <>
@@ -124,12 +132,41 @@ export default function BookDemoPage() {
                 <div className="bd-form-panel">
                     <div className="bd-form-outer">
                         <div className="bd-form-inner">
+                            <div className="bd-tabs">
+                                <button
+                                    className={`bd-tab ${activeTab === 'demo' ? 'active' : ''}`}
+                                    onClick={() => setActiveTab('demo')}
+                                >
+                                    Book Demo
+                                </button>
+                                <button
+                                    className={`bd-tab ${activeTab === 'report' ? 'active' : ''}`}
+                                    onClick={() => setActiveTab('report')}
+                                >
+                                    Request Report
+                                </button>
+                            </div>
+
                             <div className="bd-form-header">
-                                <h2 className="bd-form-title">Book your demo</h2>
+                                <h2 className="bd-form-title">
+                                    {activeTab === 'demo' ? 'Book your demo' : 'Request your report'}
+                                </h2>
                                 <p className="bd-form-sub">We&apos;ll be in touch within one business day.</p>
                             </div>
 
                             <div id="hs-form-target" className="bd-hs-form" />
+
+                            <div className="bd-switch-wrapper">
+                                <span className="bd-switch-text">
+                                    {activeTab === 'demo' ? 'Looking for insights?' : 'Want to see it in action?'}
+                                </span>
+                                <button
+                                    onClick={() => setActiveTab(activeTab === 'demo' ? 'report' : 'demo')}
+                                    className="bd-switch-link"
+                                >
+                                    {activeTab === 'demo' ? 'Request Report instead' : 'Book Demo instead'}
+                                </button>
+                            </div>
 
                             <div className="bd-trust-row">
                                 {[
@@ -139,8 +176,8 @@ export default function BookDemoPage() {
                                 ].map(t => (
                                     <span key={t} className="bd-trust-item">
                                         <svg className="bd-trust-icon" viewBox="0 0 12 12" fill="none" aria-hidden="true">
-                                            <circle cx="6" cy="6" r="5.5" stroke="#0d9488" strokeWidth="1" />
-                                            <path d="M3.5 6l1.8 1.8L8.5 4.5" stroke="#0d9488" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+                                            <circle cx="6" cy="6" r="5.5" stroke="#008a89" strokeWidth="1" />
+                                            <path d="M3.5 6l1.8 1.8L8.5 4.5" stroke="#008a89" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
                                         </svg>
                                         {t}
                                     </span>
@@ -211,14 +248,14 @@ export default function BookDemoPage() {
     font-weight: 700;
     letter-spacing: 0.22em;
     text-transform: uppercase;
-    color: #0d9488;
+    color: #008a89;
     margin-bottom: 28px;
 }
 .bd-eyebrow-line {
     display: inline-block;
     width: 20px;
     height: 1.5px;
-    background: #0d9488;
+    background: #008a89;
     flex-shrink: 0;
 }
 
@@ -266,8 +303,7 @@ export default function BookDemoPage() {
     font-size: 9.5px;
     font-weight: 700;
     letter-spacing: 0.12em;
-    color: #0d9488;
-    min-width: 26px;
+    color: #008a89;
     padding-top: 3px;
 }
 .bd-step-body {
@@ -299,9 +335,7 @@ export default function BookDemoPage() {
 .bd-quote-bar {
     width: 2px;
     min-height: 40px;
-    background: #0d9488;
-    flex-shrink: 0;
-    border-radius: 2px;
+    background: #008a89;
 }
 .bd-quote-text {
     font-family: var(--font-body, 'Inter', sans-serif);
@@ -399,9 +433,9 @@ export default function BookDemoPage() {
 .bd-hs-form input[type="text"]:focus,
 .bd-hs-form input[type="email"]:focus,
 .bd-hs-form input[type="tel"]:focus {
-    border-color: #0d9488 !important;
+    border-color: #008a89 !important;
     background: #ffffff !important;
-    box-shadow: 0 0 0 3.5px rgba(13,148,136,0.1) !important;
+    box-shadow: 0 0 0 3.5px rgba(0,138,137,0.1) !important;
 }
 .bd-hs-form .hs-fieldtype-booleancheckbox label,
 .bd-hs-form .hs-fieldtype-checkbox label,
@@ -430,7 +464,7 @@ export default function BookDemoPage() {
     -webkit-appearance: none !important;
 }
 .bd-hs-form input[type="submit"]:hover {
-    background: #0d9488 !important;
+    background: #008a89 !important;
 }
 .bd-hs-form input[type="submit"]:active {
     transform: scale(0.985) !important;
@@ -453,10 +487,69 @@ export default function BookDemoPage() {
     color: #111111 !important;
     padding: 28px 24px !important;
     border: 1px solid #e5e5e5 !important;
-    border-left: 3px solid #0d9488 !important;
+    border-left: 3px solid #008a89 !important;
     border-radius: 12px !important;
     background: #f8fffe !important;
     line-height: 1.65 !important;
+}
+
+/* Tabs & Switch Links */
+.bd-tabs {
+    display: flex;
+    gap: 8px;
+    background: #f5f5f3;
+    padding: 6px;
+    border-radius: 12px;
+    margin-bottom: 32px;
+}
+.bd-tab {
+    flex: 1;
+    font-family: var(--font-body, 'Inter', sans-serif);
+    font-size: 12.5px;
+    font-weight: 600;
+    color: #888888;
+    background: transparent;
+    border: none;
+    padding: 10px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    letter-spacing: -0.01em;
+}
+.bd-tab:hover {
+    color: #111111;
+}
+.bd-tab.active {
+    background: #ffffff;
+    color: #111111;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+.bd-switch-wrapper {
+    margin-top: 18px;
+    text-align: center;
+    font-family: var(--font-body, 'Inter', sans-serif);
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+.bd-switch-text {
+    color: #888888;
+}
+.bd-switch-link {
+    background: none;
+    border: none;
+    color: #008a89;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 0;
+    transition: color 0.2s;
+}
+.bd-switch-link:hover {
+    color: #006b6a;
+    text-decoration: underline;
 }
 
 /* Trust row */
@@ -513,12 +606,17 @@ export default function BookDemoPage() {
     .bd-copy-panel {
         position: static;
         min-height: auto;
-        padding: 100px clamp(24px, 5vw, 48px) 48px;
+        padding: 100px clamp(24px, 5vw, 48px) 32px;
     }
     .bd-form-panel {
+        order: -1;
         min-height: auto;
-        padding: 40px clamp(24px, 5vw, 48px) 72px;
+        padding: 100px clamp(24px, 5vw, 48px) 40px;
     }
+    .bd-sub,
+    .bd-steps,
+    .bd-quote { display: none; }
+    .bd-headline { margin-bottom: 0; }
     .bd-footer { flex-direction: column; gap: 12px; text-align: center; }
     .bd-trust-row { gap: 12px; }
 }

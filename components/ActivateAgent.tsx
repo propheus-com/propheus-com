@@ -1,17 +1,17 @@
-﻿'use client';
+'use client';
 
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 // --- Icons ---
 const ChevronLeft = () => (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
+    <svg viewBox="0 0 24 24" fill="none" stroke="#111111" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
         <path d="M15 18l-6-6 6-6" />
     </svg>
 );
 
 const ChevronRight = () => (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
+    <svg viewBox="0 0 24 24" fill="none" stroke="#111111" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
         <path d="M9 18l6-6-6-6" />
     </svg>
 );
@@ -21,11 +21,16 @@ const stateLabels = ['Satellite View', 'Aerial View', ''];
 
 // Configurable input cooldown (ms) — applies to buttons and keys
 const INPUT_COOLDOWN_MS = 500;
-// Scroll gesture end delay (ms) — unlocks after this duration of no wheel events.
-// A single trackpad swipe generates events for 1-2s; this ensures one swipe = one action.
-const SCROLL_GESTURE_END_MS = 400;
+// Accumulated delta threshold — how much total scroll delta to trigger one state change.
+// Prevents micro-scrolls from trackpad and requires intentional gesture.
+const DELTA_THRESHOLD = 100;
+// Gesture reset delay (ms) — after this silence window, reset accumulated delta (new gesture).
+const GESTURE_RESET_MS = 250;
+// Per-action cooldown (ms) — minimum time between scroll-triggered state changes.
+// Prevents a single long trackpad gesture from causing multiple transitions.
+const STEP_COOLDOWN_MS = 800;
 
-export default function ActivateAgent() {
+export default function ActivateAgent({ isMobile = false }: { isMobile?: boolean }) {
     const [status, setStatus] = useState<'idle' | 'loading' | 'active' | 'hidden'>('idle');
     const [step, setStep] = useState(1);
     const [displayStep, setDisplayStep] = useState(1);
@@ -41,8 +46,11 @@ export default function ActivateAgent() {
     const lastActionTimeRef = useRef(0);
     const activeStartTimeRef = useRef(0);
     const transitionTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-    const scrollLockedRef = useRef(false);
+    const accumulatedDeltaRef = useRef(0);
     const gestureTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const queuedDirectionRef = useRef<'next' | 'prev' | null>(null);
+    const isTransitioningRef = useRef(false);
+    const lastScrollActionRef = useRef(0);
 
     // --- Spotlight pointer tracking ---
     useEffect(() => {
@@ -71,11 +79,20 @@ export default function ActivateAgent() {
             if (state === 0) {
                 setStatus('idle'); setStep(1); setDisplayStep(1);
                 setDirection('forward'); setIsTransitioning(false);
+                // Clear scroll queue so momentum doesn't chain transitions
+                queuedDirectionRef.current = null;
+                accumulatedDeltaRef.current = 0;
             } else if (state >= 1 && state <= 3) {
                 setStep(state);
                 setDisplayStep(state);
                 setIsTransitioning(false);
+                isTransitioningRef.current = false;
                 if (transitionTimerRef.current) clearTimeout(transitionTimerRef.current);
+                // Clear scroll queue and enforce cooldown so each state
+                // requires a fresh, intentional scroll gesture
+                queuedDirectionRef.current = null;
+                accumulatedDeltaRef.current = 0;
+                lastScrollActionRef.current = Date.now();
                 if (statusRef.current === 'hidden') {
                     // Returning from Lenis — fade back in
                     setStatus('active');
@@ -90,6 +107,10 @@ export default function ActivateAgent() {
             setStep(3);
             setDisplayStep(3);
             setIsTransitioning(false);
+            isTransitioningRef.current = false;
+            queuedDirectionRef.current = null;
+            accumulatedDeltaRef.current = 0;
+            lastScrollActionRef.current = Date.now();
         };
         window.addEventListener('propheus:statechange', onStateChange);
         window.addEventListener('propheus:agent-reenter', onReenter);
@@ -149,9 +170,18 @@ export default function ActivateAgent() {
         stepRef.current = nextStep;
 
         setIsTransitioning(true);
+        isTransitioningRef.current = true;
         setDisplayStep(nextStep);
         if (transitionTimerRef.current) clearTimeout(transitionTimerRef.current);
-        transitionTimerRef.current = setTimeout(() => setIsTransitioning(false), 1000);
+        // Safety-only fallback. The real sync point is propheus:statechange from
+        // PropheusExperience.finalizeTransition(), which fires isTransitioning=false
+        // at the exact moment the animation completes. Canvas transitions take ~2.3s,
+        // so this timer must be LONGER than any real transition to avoid premature
+        // queue-firing that would skip states.
+        transitionTimerRef.current = setTimeout(() => {
+            setIsTransitioning(false);
+            isTransitioningRef.current = false;
+        }, 5000);
 
         window.dispatchEvent(new CustomEvent(dir === 'next' ? 'propheus:advance' : 'propheus:reverse'));
     }, []);
@@ -170,31 +200,54 @@ export default function ActivateAgent() {
         return () => { window.removeEventListener('wheel', onWheel); window.removeEventListener('keydown', onKeydown); };
     }, [status, handleLaunch]);
 
-    // --- Scroll = nav (active) — gesture-based debouncing ---
-    // A single trackpad swipe fires many wheel events over 1-2s.
-    // We lock after the first event and only unlock after SCROLL_GESTURE_END_MS
-    // of silence, treating the entire swipe as one intent.
+    // --- Scroll = nav (active) — delta-accumulator + queued-intent ---
+    // Accumulates wheel delta until DELTA_THRESHOLD is crossed → triggers one state change.
+    // If a transition is in-progress, queues one pending intent (max 1) so spam scroll
+    // progresses through states instead of getting stuck.
+    // Uses refs for isTransitioning to avoid re-running the effect (which would wipe queue).
     useEffect(() => {
         if (status !== 'active') return;
-        scrollLockedRef.current = false;
+        accumulatedDeltaRef.current = 0;
 
         const onWheel = (e: WheelEvent) => {
-            // Reset gesture-end timer on every wheel event
+            // Reset gesture timer — after silence, accumulated delta resets
             if (gestureTimerRef.current) clearTimeout(gestureTimerRef.current);
             gestureTimerRef.current = setTimeout(() => {
-                scrollLockedRef.current = false;
-            }, SCROLL_GESTURE_END_MS);
-
-            // If locked from a previous scroll action, ignore
-            if (scrollLockedRef.current) return;
+                accumulatedDeltaRef.current = 0;
+            }, GESTURE_RESET_MS);
 
             // Guard against immediate scroll right after becoming active
             if (Date.now() - activeStartTimeRef.current < INPUT_COOLDOWN_MS) return;
 
-            // Lock and act — one swipe = one state change
-            scrollLockedRef.current = true;
-            if (e.deltaY > 0) handleStepChange('next');
-            else if (e.deltaY < 0) handleStepChange('prev');
+            // Per-action cooldown: don't fire again too soon after last scroll action
+            if (Date.now() - lastScrollActionRef.current < STEP_COOLDOWN_MS) {
+                // But still allow queueing during the cooldown if transitioning
+                // Accumulate delta so when cooldown expires, a queued intent is ready
+                accumulatedDeltaRef.current += e.deltaY;
+                if (Math.abs(accumulatedDeltaRef.current) >= DELTA_THRESHOLD && isTransitioningRef.current) {
+                    const dir: 'next' | 'prev' = accumulatedDeltaRef.current > 0 ? 'next' : 'prev';
+                    queuedDirectionRef.current = dir;
+                    accumulatedDeltaRef.current = 0;
+                }
+                return;
+            }
+
+            // Accumulate delta with direction sign
+            accumulatedDeltaRef.current += e.deltaY;
+
+            // Check if threshold is crossed
+            if (Math.abs(accumulatedDeltaRef.current) >= DELTA_THRESHOLD) {
+                const dir: 'next' | 'prev' = accumulatedDeltaRef.current > 0 ? 'next' : 'prev';
+                accumulatedDeltaRef.current = 0; // reset for next gesture
+
+                if (isTransitioningRef.current) {
+                    // Queue intent — will fire when current transition ends
+                    queuedDirectionRef.current = dir;
+                } else {
+                    lastScrollActionRef.current = Date.now();
+                    handleStepChange(dir);
+                }
+            }
         };
 
         window.addEventListener('wheel', onWheel, { passive: true });
@@ -206,6 +259,20 @@ export default function ActivateAgent() {
             }
         };
     }, [status, handleStepChange]);
+
+    // --- Fire queued scroll intent after transition completes ---
+    useEffect(() => {
+        if (!isTransitioning && queuedDirectionRef.current && status === 'active') {
+            const dir = queuedDirectionRef.current;
+            queuedDirectionRef.current = null;
+            // Use a short timeout to let the state settle before firing next transition
+            const timer = setTimeout(() => {
+                lastScrollActionRef.current = Date.now();
+                handleStepChange(dir);
+            }, 50);
+            return () => clearTimeout(timer);
+        }
+    }, [isTransitioning, status, handleStepChange]);
 
     // Don't render when hidden
     if (status === 'hidden') return null;
@@ -224,10 +291,11 @@ export default function ActivateAgent() {
                     backgroundColor: 'var(--backdrop)',
                 } as React.CSSProperties}
                 animate={{
-                    width: status === 'idle' ? 520
-                        : status === 'loading' ? 76
-                        : 460,
-                    height: status === 'idle' ? 80 : 76,
+                    width: status === 'idle'
+                        ? (isMobile ? 300 : 520)
+                        : status === 'loading' ? (isMobile ? 56 : 76)
+                        : (isMobile ? 280 : 460),
+                    height: status === 'idle' ? (isMobile ? 60 : 80) : (isMobile ? 56 : 76),
                     scale: 1,
                     opacity: 1,
                 }}
@@ -246,26 +314,26 @@ export default function ActivateAgent() {
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0, scale: 0.9, transition: { duration: 0.18 } }}
                             transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
-                            className="flex items-center justify-between w-full pl-6 pr-2.5 gap-4"
+                            className={`flex items-center justify-between w-full ${isMobile ? 'pl-3 pr-1.5 gap-2' : 'pl-6 pr-2.5 gap-4'}`}
                         >
-                            <div className="flex items-center gap-4 min-w-0">
+                            <div className={`flex items-center ${isMobile ? 'gap-2' : 'gap-4'} min-w-0`}>
                                 <div>
                                     <img
                                         src="/PropheusIcon.webp"
                                         alt="Propheus AI Logo"
                                         aria-hidden="true"
-                                        className="w-10 h-10 object-contain rounded-full"
+                                        className={`${isMobile ? 'w-7 h-7' : 'w-10 h-10'} object-contain rounded-full`}
                                         style={{ filter: 'drop-shadow(0 0 5px rgba(45,212,191,0.65))' }}
                                     />
                                 </div>
                                 <div className="flex flex-col gap-0.5 min-w-0">
-                                    <span className="text-white/40 text-[9px] font-black uppercase tracking-[0.28em] leading-none">System Standby</span>
-                                    <span className="text-white text-[18px] font-black tracking-tight leading-none">Propheus AI</span>
+                                    <span className={`text-white/40 ${isMobile ? 'text-[7px]' : 'text-[9px]'} font-black uppercase tracking-[0.28em] leading-none`}>System Standby</span>
+                                    <span className={`text-white ${isMobile ? 'text-[13px]' : 'text-[18px]'} font-black tracking-tight leading-none`}>Propheus AI</span>
                                 </div>
                             </div>
                             <button
                                 onClick={handleLaunch}
-                                className="shrink-0 bg-white hover:bg-white/90 text-black font-black text-[13px] uppercase tracking-[0.06em] px-7 h-[62px] rounded-full transition-all duration-200 active:scale-95 shadow-[0_2px_24px_rgba(255,255,255,0.12)]"
+                                className={`shrink-0 bg-white hover:bg-white/90 text-black font-black ${isMobile ? 'text-[11px] px-4 h-[46px]' : 'text-[13px] px-7 h-[62px]'} uppercase tracking-[0.06em] rounded-full transition-all duration-200 active:scale-95 shadow-[0_2px_24px_rgba(255,255,255,0.12)]`}
                             >
                                 Activate
                             </button>
@@ -311,12 +379,12 @@ export default function ActivateAgent() {
                         >
                             <button
                                 onClick={() => handleStepChange('prev')}
-                                className="w-11 h-11 rounded-full flex items-center justify-center transition-all shrink-0 outline-none border border-white/5 bg-white/[0.02] active:scale-90 text-white/40 hover:text-white hover:bg-white/[0.08]"
+                                className={`${isMobile ? 'w-8 h-8' : 'w-11 h-11'} rounded-full flex items-center justify-center transition-all shrink-0 outline-none bg-white active:scale-90 shadow-[0_2px_12px_rgba(255,255,255,0.15)] hover:shadow-[0_4px_20px_rgba(255,255,255,0.25)]`}
                             >
                                 <ChevronLeft />
                             </button>
 
-                            <div className="flex-1 flex flex-col items-center justify-center px-8">
+                            <div className={`flex-1 flex flex-col items-center justify-center ${isMobile ? 'px-3' : 'px-8'}`}>
                                 <div className="flex gap-3 w-full mb-3.5">
                                     {[1, 2, 3].map((i) => {
                                         const filled = i <= step;
@@ -325,9 +393,9 @@ export default function ActivateAgent() {
                                             <div key={i} className="flex-1 h-[3px] bg-white/[0.05] rounded-full relative overflow-hidden">
                                                 <motion.div
                                                     initial={false}
-                                                    animate={{ x: filled ? '0%' : emptyX, opacity: filled ? 1 : 0, backgroundColor: i === step ? '#2dd4bf' : '#14b8a6' }}
+                                                    animate={{ x: filled ? '0%' : emptyX, opacity: filled ? 1 : 0, backgroundColor: i === step ? '#008a89' : '#006f6e' }}
                                                     transition={{ duration: 0.12, ease: 'easeOut' }}
-                                                    className={`absolute inset-0 rounded-full ${i === step ? 'shadow-[0_0_20px_rgba(45,212,191,0.5)]' : ''}`}
+                                                    className={`absolute inset-0 rounded-full ${i === step ? 'shadow-[0_0_20px_rgba(0,138,137,0.5)]' : ''}`}
                                                 />
                                             </div>
                                         );
@@ -340,7 +408,7 @@ export default function ActivateAgent() {
                                             initial={{ opacity: 0, y: 5 }}
                                             animate={{ opacity: 1, y: 0 }}
                                             exit={{ opacity: 0, y: -5 }}
-                                            className="text-teal-400 font-black text-[10px] uppercase tracking-[0.2em] whitespace-nowrap block"
+                                            className="font-black text-[10px] uppercase tracking-[0.2em] whitespace-nowrap block" style={{ color: '#008a89' }}
                                         >
                                             {displayStep === 3 ? 'Scroll to Explore' : `0${displayStep}`}
                                         </motion.span>
@@ -362,7 +430,7 @@ export default function ActivateAgent() {
 
                             <button
                                 onClick={() => handleStepChange('next')}
-                                className="w-11 h-11 rounded-full flex items-center justify-center transition-all shrink-0 outline-none border border-white/5 bg-white/[0.02] active:scale-90 text-white/40 hover:text-white hover:bg-white/[0.08]"
+                                className={`${isMobile ? 'w-8 h-8' : 'w-11 h-11'} rounded-full flex items-center justify-center transition-all shrink-0 outline-none bg-white active:scale-90 shadow-[0_2px_12px_rgba(255,255,255,0.15)] hover:shadow-[0_4px_20px_rgba(255,255,255,0.25)]`}
                             >
                                 <ChevronRight />
                             </button>

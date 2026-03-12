@@ -17,16 +17,16 @@ import GlowCard from './GlowCard';
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
-const CIRCLE_SIZE   = 280;   // diameter of the circular lens
+const CIRCLE_SIZE = 280;   // diameter of the circular lens
 const PANEL_OVERLAP = 100;    // how many px the circle overlaps the data panel (reduced so text is visible)
-const RADIUS        = 110;   // gauge arc radius (SVG viewBox 300 × 300)
+const RADIUS = 110;   // gauge arc radius (SVG viewBox 300 × 300)
 const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
-const SEGMENT_GAP   = 0;     // SVG units of gap between adjacent arcs
+const SEGMENT_GAP = 0;     // SVG units of gap between adjacent arcs
 
 const SEGMENTS = [
-    { label: 'Vegetation',   value: 84, color: '#10b981' },
+    { label: 'Vegetation', value: 84, color: '#10b981' },
     { label: 'Sand', value: 10, color: '#eab308' },
-    { label: 'Barren',       value:  6, color: '#94a3b8' },
+    { label: 'Barren', value: 6, color: '#94a3b8' },
 ] as const;
 
 // Pre-compute per-segment start-rotation offsets
@@ -72,7 +72,7 @@ function MetricRow({ label, value, color }: {
 
 export default function VegetationWidget() {
     const [isVisible, setIsVisible] = useState(false);
-    const [playKey, setPlayKey]     = useState(0);
+    const [playKey, setPlayKey] = useState(0);
     const [entryDelay, setEntryDelay] = useState(0.3);
     const comingBack = useRef(false);
 
@@ -85,13 +85,13 @@ export default function VegetationWidget() {
             setIsVisible(true);
             setPlayKey(k => k + 1);
         };
-        const onExit  = () => setIsVisible(false);
-        window.addEventListener('propheus:state2',      onState2);
-        window.addEventListener('propheus:state1',      onEnter);
+        const onExit = () => setIsVisible(false);
+        window.addEventListener('propheus:state2', onState2);
+        window.addEventListener('propheus:state1', onEnter);
         window.addEventListener('propheus:state1:exit', onExit);
         return () => {
-            window.removeEventListener('propheus:state2',      onState2);
-            window.removeEventListener('propheus:state1',      onEnter);
+            window.removeEventListener('propheus:state2', onState2);
+            window.removeEventListener('propheus:state1', onEnter);
             window.removeEventListener('propheus:state1:exit', onExit);
         };
     }, []);
@@ -115,14 +115,14 @@ export default function VegetationWidget() {
                     >
                         {/* ── DATA PANEL — z-20, sits behind circle ── */}
                         <motion.div
-                            initial={{ opacity: 0, y: 14, filter: 'blur(10px)' }}
-                            animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-                            exit={{ opacity: 0, y: 14, filter: 'blur(10px)', transition: fastExit }}
-                        transition={{ duration: 0.85, delay: entryDelay, ease: [0.22, 1, 0.36, 1] }}
+                            initial={{ opacity: 0, filter: 'blur(10px)' }}
+                            animate={{ opacity: 1, filter: 'blur(0px)' }}
+                            exit={{ opacity: 0, filter: 'blur(10px)', transition: fastExit }}
+                            transition={{ duration: 0.85, delay: entryDelay, ease: [0.22, 1, 0.36, 1] }}
                             style={{
                                 position: 'absolute',
-                                top: '50%',
-                                transform: 'translateY(-50%)',
+                                // top: '0%',
+                                // transform: 'translateY(-10%)',
                                 left: PANEL_OVERLAP,   // circle overlaps left portion
                                 width: 300,            // wide enough for visible text content
                                 zIndex: 20,
@@ -174,10 +174,10 @@ export default function VegetationWidget() {
                             initial={{ opacity: 0, filter: 'blur(10px)' }}
                             animate={{ opacity: 1, filter: 'blur(0px)' }}
                             exit={{ opacity: 0, filter: 'blur(10px)', transition: fastExit }}
-                        transition={{ duration: 0.85, delay: entryDelay }}
+                            transition={{ duration: 0.85, delay: entryDelay }}
                             style={{
                                 position: 'absolute',
-                                top: '105%',
+                                top: '50%',
                                 left: 0,
                                 transform: 'translateY(-50%)',
                                 width: CIRCLE_SIZE, height: CIRCLE_SIZE,
@@ -198,8 +198,8 @@ export default function VegetationWidget() {
                                             alt="Satellite Analysis"
                                             animate={{
                                                 scale: [1.15, 1.28, 1.2, 1.35, 1.18, 1.15],
-                                                x:     [0, 12, -6, 8, -10, 0],
-                                                y:     [0, -8, 10, -5,   6, 0],
+                                                x: [0, 12, -6, 8, -10, 0],
+                                                y: [0, -8, 10, -5, 6, 0],
                                             }}
                                             transition={{
                                                 duration: 22,

@@ -189,10 +189,25 @@ a {
     -webkit-mask-image: linear-gradient(to bottom, black 0%, black 72%, transparent 100%);
 }
 
-.parallax-col-fl { left: 1%; top: 8%; }
-.parallax-col-il { left: 15%; top: 4%; }
-.parallax-col-ir { right: 15%; top: 8%; }
-.parallax-col-fr { right: 1%; top: 4%; }
+.parallax-col-fl {
+    left: 1%;
+    top: 8%;
+}
+
+.parallax-col-il {
+    left: 15%;
+    top: 4%;
+}
+
+.parallax-col-ir {
+    right: 15%;
+    top: 8%;
+}
+
+.parallax-col-fr {
+    right: 1%;
+    top: 4%;
+}
 
 .parallax-img {
     border-radius: 12px;
@@ -260,182 +275,147 @@ a {
 }
 
 /* ============================================
-   NAVBAR
+   NAVBAR — Activation-based visibility system
+   ============================================
+   Phases:
+     Default: invisible (opacity 0)
+     .nav-hero: visible + transparent bg (hero states 0-1)
+     .nav-force-hidden: completely hidden (states 2-3 + lenis)
+     .nav-activated: visible + glassmorphic bg (post case-study)
+     .nav-hidden: slides up on scroll-down
+     .nav-dark: dark frosted glass for dark sections
+     body.lenis-scroll-mode: force-hidden via CSS during canvas transition
    ============================================ */
 .site-navbar {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
-    height: 72px; /* fixed height prevents resize on scroll */
+    height: 72px;
     z-index: 100;
-    background: transparent;
-    backdrop-filter: none;
-    -webkit-backdrop-filter: none;
-    border-bottom: 1px solid transparent;
     opacity: 0;
-    transform: translateY(0);
+    pointer-events: none;
+    transform: translateY(-20px);
+    background: rgba(255, 255, 255, 0.78);
+    backdrop-filter: blur(20px) saturate(200%);
+    -webkit-backdrop-filter: blur(20px) saturate(200%);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
     transition:
-        opacity 0.35s ease,
-        transform 0.4s cubic-bezier(0.4, 0, 0.2, 1),
-        border-color 0.3s var(--ease-smooth),
-        background-color 0.3s var(--ease-smooth),
-        backdrop-filter 0.3s var(--ease-smooth);
-    will-change: opacity, transform, border-color;
+        opacity 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+        transform 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+        background-color 0.4s var(--ease-smooth),
+        backdrop-filter 0.4s var(--ease-smooth),
+        border-color 0.4s var(--ease-smooth);
+    will-change: opacity, transform;
 }
 
-/* Slide navbar above viewport on scroll-down */
+/* ── Hero mode: visible but completely transparent background ──
+   Only links/logo/buttons show — no glass, no border */
+.site-navbar.nav-hero {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0);
+    background: transparent !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    border-bottom-color: transparent !important;
+}
+
+/* White text + shadow for readability over satellite imagery */
+.site-navbar.nav-hero .navbar-link {
+    color: rgba(255, 255, 255, 0.92);
+    text-shadow: 0 1px 6px rgba(0, 0, 0, 0.45);
+}
+
+.site-navbar.nav-hero .navbar-link:hover {
+    color: #ffffff;
+}
+
+.site-navbar.nav-hero .navbar-logo img {
+    /* Logo stays consistent — no invert, just brighter */
+    filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.4));
+}
+
+/* ── Force-hidden: completely invisible (states 2-3, lenis transition) ── */
+.site-navbar.nav-force-hidden {
+    opacity: 0 !important;
+    pointer-events: none !important;
+    transform: translateY(-20px) !important;
+    background: transparent !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    border-bottom-color: transparent !important;
+    transition: opacity 0.35s ease, background 0.35s ease !important;
+}
+
+/* ── Activated: visible with glassmorphic background ── */
+.site-navbar.nav-activated {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0);
+}
+
+/* ── Slide up on scroll-down ── */
 .site-navbar.nav-hidden {
     transform: translateY(-100%) !important;
 }
 
-.site-navbar.scrolled {
-    background: rgba(255, 255, 255, 0.82);
-    backdrop-filter: blur(20px) saturate(200%);
-    -webkit-backdrop-filter: blur(20px) saturate(200%);
-    border-bottom-color: rgba(0, 0, 0, 0.07);
-}
-
-/* Scrolled state always shows black bold links on white bg */
-.site-navbar.scrolled .navbar-link {
-    color: rgba(0, 0, 0, 0.72);
-    text-shadow: none;
-    font-weight: 700;
-}
-
-/* Lenis scroll section has a black background — suppress the white scrolled
-   state and switch all nav text/buttons to white whilst in this section. */
-body.lenis-scroll-mode .site-navbar,
-body.lenis-scroll-mode .site-navbar.scrolled {
-    background: transparent !important;
-    backdrop-filter: none !important;
-    border-bottom-color: transparent !important;
+/* ── Force-hidden during Lenis scroll (hero canvas transition) ── */
+body.lenis-scroll-mode .site-navbar {
     opacity: 0 !important;
+    pointer-events: none !important;
+    transform: translateY(-20px) !important;
 }
-body.lenis-scroll-mode .navbar-link,
-body.lenis-scroll-mode .navbar-logo {
-    color: rgba(255, 255, 255, 0.75) !important;
+
+/* ── LIGHT MODE (default) — dark text on white glass ── */
+.site-navbar .navbar-link {
+    color: rgba(0, 0, 0, 0.72);
 }
-body.lenis-scroll-mode .navbar-btn-secondary {
-    color: rgba(255, 255, 255, 0.75) !important;
-    border-color: rgba(255, 255, 255, 0.2) !important;
+
+.site-navbar .navbar-link:hover {
+    color: var(--accent-teal);
 }
-body.lenis-scroll-mode .navbar-btn-primary {
+
+/* ── DARK MODE — white text on dark frosted glass ── */
+.site-navbar.nav-dark {
+    background: rgba(8, 8, 8, 0.72);
+    backdrop-filter: blur(24px) saturate(180%);
+    -webkit-backdrop-filter: blur(24px) saturate(180%);
+    border-bottom-color: rgba(255, 255, 255, 0.06);
+}
+
+.site-navbar.nav-dark .navbar-link {
+    color: rgba(255, 255, 255, 0.78);
+}
+
+.site-navbar.nav-dark .navbar-link:hover {
+    color: #1cd2b3;
+}
+
+.site-navbar.nav-dark .navbar-link::after {
+    background: #1cd2b3;
+}
+
+/* Dark mode: invert REQUEST ACCESS button — black text on white bg */
+.site-navbar.nav-dark .navbar-hbg-inner {
     background: #ffffff !important;
     color: #111111 !important;
-    border-color: rgba(255, 255, 255, 0.5) !important;
 }
 
-/* ── Lenis-revealed: navbar appears over white page background after canvas shrink ───────── */
-/* Navbar becomes visible once lenis zone is done (user can see white page content beneath) */
-body.lenis-revealed .site-navbar {
-    opacity: 1 !important;
-    background: rgba(255, 255, 255, 0.72) !important;
-    backdrop-filter: blur(18px) saturate(200%) !important;
-    -webkit-backdrop-filter: blur(18px) saturate(200%) !important;
-    border-bottom-color: rgba(0, 0, 0, 0.07) !important;
-    transition:
-        opacity 0.5s ease,
-        transform 0.4s cubic-bezier(0.4, 0, 0.2, 1),
-        border-color 0.3s var(--ease-smooth),
-        background-color 0.3s var(--ease-smooth) !important;
-}
-body.lenis-revealed .site-navbar.scrolled {
-    background: rgba(255, 255, 255, 0.88) !important;
-    backdrop-filter: blur(22px) saturate(220%) !important;
-    -webkit-backdrop-filter: blur(22px) saturate(220%) !important;
-}
-body.lenis-revealed .site-navbar:not(.scrolled)::before {
-    background: none;
-}
-body.lenis-revealed .site-navbar:not(.scrolled) .navbar-link {
-    color: rgba(0, 0, 0, 0.72) !important;
-    text-shadow: none !important;
-}
-body.lenis-revealed .site-navbar.scrolled .navbar-link {
-    color: rgba(0, 0, 0, 0.72) !important;
-    text-shadow: none !important;
-}
-body.lenis-revealed .site-navbar:not(.scrolled) .navbar-link:hover {
-    color: var(--accent-teal) !important;
-}
-/* Watch Demo is now a .navbar-link — covered above */
-/* Request Access: filled black button on white page */
-body.lenis-revealed .site-navbar:not(.scrolled) .navbar-btn-primary {
-    background: #111111 !important;
-    color: #ffffff !important;
-    border-color: #111111 !important;
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.18) !important;
-}
-body.lenis-revealed .site-navbar:not(.scrolled) .navbar-btn-primary:hover {
-    background: #000000 !important;
-    border-color: #000000 !important;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.28) !important;
-    transform: translateY(-2px);
+.site-navbar.nav-dark .navbar-hbg-text {
+    color: #111111 !important;
 }
 
-/* ── Hero mode (transparent navbar, states 0 & 1) — white text, bold ──────── */
-/* Gradient shadow behind navbar for readability over satellite imagery */
-.site-navbar:not(.scrolled)::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 110px;
-    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.22) 0%, transparent 100%);
-    pointer-events: none;
-    z-index: 0;
-}
+/* Logo stays consistent in dark mode — NO invert */
 
-.site-navbar:not(.scrolled) .navbar-link {
-    color: rgba(255, 255, 255, 0.92); /* white in hero mode */
-    text-shadow: 0 1px 6px rgba(0, 0, 0, 0.45);
-}
-.site-navbar:not(.scrolled) .navbar-link:hover {
-    color: #fff;
-}
-/* Watch Demo: frosted dark glass */
-.site-navbar:not(.scrolled) .navbar-btn-secondary {
-    background: rgba(0, 0, 0, 0.28);
-    color: rgba(255, 255, 255, 0.8);
-    border-color: rgba(255, 255, 255, 0.16);
-    backdrop-filter: blur(14px) saturate(160%);
-    -webkit-backdrop-filter: blur(14px) saturate(160%);
-    text-shadow: none;
-}
-.site-navbar:not(.scrolled) .navbar-btn-secondary:hover {
-    background: rgba(0, 0, 0, 0.42);
-    border-color: rgba(255, 255, 255, 0.3);
-    color: #fff;
-    transform: translateY(-2px);
-}
-/* Request Access: white Apple-style pill over hero */
-.site-navbar:not(.scrolled) .navbar-btn-primary {
-    background: #ffffff;
-    color: #111111;
-    border: 1px solid rgba(255, 255, 255, 0.6);
-    backdrop-filter: none;
-    -webkit-backdrop-filter: none;
-    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.22), 0 1px 4px rgba(0, 0, 0, 0.12);
-    font-weight: 800;
-    letter-spacing: 0.05em;
-}
-.site-navbar:not(.scrolled) .navbar-btn-primary:hover {
-    background: #f5f5f5;
-    border-color: rgba(255, 255, 255, 0.8);
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.28);
-}
-/* lenis-scroll-mode already uses !important so overrides the above correctly */
-
+/* ── Layout ── */
 .navbar-container {
     position: relative;
     z-index: 1;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    height: 100%; /* fill the fixed navbar height */
+    height: 100%;
     padding: 0 var(--section-padding-x);
     max-width: 100%;
 }
@@ -461,17 +441,19 @@ body.lenis-revealed .site-navbar:not(.scrolled) .navbar-btn-primary:hover {
     font-size: 1.25rem;
     color: var(--text-primary);
     text-decoration: none;
-    transition: opacity 0.2s var(--ease-out);
+    transition: opacity 0.25s var(--ease-out), transform 0.25s var(--ease-out);
 }
 
 .navbar-logo:hover {
     opacity: 0.7;
+    transform: scale(1.04);
 }
 
 .navbar-logo img {
     height: 30px;
     width: auto;
     filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.15));
+    transition: filter 0.4s var(--ease-smooth);
 }
 
 .navbar-links {
@@ -482,18 +464,20 @@ body.lenis-revealed .site-navbar:not(.scrolled) .navbar-btn-primary:hover {
 
 .navbar-link {
     font-family: var(--font-body);
-    font-weight: 700; /* always bold */
-    font-size: 0.82rem; /* consistent size across all states */
+    font-weight: 700;
+    font-size: 0.82rem !important;
+    /* lock size — prevents any inheritance glitch */
     letter-spacing: 0.09em;
     color: var(--text-primary);
     text-decoration: none;
     position: relative;
-    transition: color 0.2s var(--ease-out);
+    transition: color 0.22s var(--ease-out);
     /* Reset button defaults when used as <button> */
     background: none;
     border: none;
     padding: 0;
     cursor: pointer;
+    line-height: 1.2;
 }
 
 .navbar-link::after {
@@ -507,70 +491,43 @@ body.lenis-revealed .site-navbar:not(.scrolled) .navbar-btn-primary:hover {
     transition: width 0.3s var(--ease-smooth);
 }
 
-.navbar-link:hover {
-    color: var(--accent-teal);
-}
-
 .navbar-link:hover::after {
     width: 100%;
-}
-
-.dropdown-icon {
-    font-size: 0.6rem;
-    margin-left: 0.25rem;
 }
 
 .navbar-right {
     display: flex;
     align-items: center;
-    gap: 0.75rem;
+    gap: 1rem;
 }
 
-.navbar-btn {
-    padding: 0.72rem 1.55rem;
-    border-radius: 28px;
-    font-family: var(--font-body);
-    font-weight: 700;
-    font-size: 0.76rem;
-    letter-spacing: 0.04em;
-    border: none;
+/* ── HoverBorderGradient "Request Access" button ── */
+.navbar-hbg-btn {
+    text-decoration: none !important;
     cursor: pointer;
-    transition: all 0.3s var(--ease-smooth);
+    transition: transform 0.25s var(--ease-smooth), box-shadow 0.25s var(--ease-smooth);
 }
 
-.navbar-btn-secondary {
-    background: transparent;
-    color: var(--text-primary);
-    border: 1px solid var(--border-light);
-}
-
-.navbar-btn-secondary:hover {
-    background: var(--bg-surface);
-    border-color: #111111;
-    color: #111111;
+.navbar-hbg-btn:hover {
     transform: translateY(-2px);
 }
 
-.navbar-btn-secondary:active {
-    transform: scale(0.98);
+.navbar-hbg-btn:active {
+    transform: scale(0.97);
 }
 
-.navbar-btn-primary {
-    background: #ffffff;
-    color: #111111;
-    border: 1px solid rgba(0, 0, 0, 0.12);
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+.navbar-hbg-inner {
+    font-family: var(--font-body) !important;
+    font-size: 0.72rem !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.08em !important;
+    padding: 0.6rem 1.3rem !important;
+    white-space: nowrap;
 }
 
-.navbar-btn-primary:hover {
-    background: #f7f7f7;
-    border-color: rgba(0, 0, 0, 0.18);
-    transform: translateY(-1px);
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
-}
-
-.navbar-btn-primary:active {
-    transform: scale(0.99);
+.navbar-hbg-text {
+    position: relative;
+    z-index: 2;
 }
 
 /* ============================================
@@ -610,9 +567,11 @@ body.lenis-revealed .site-navbar:not(.scrolled) .navbar-btn-primary:hover {
     inset: 0;
     display: flex;
     flex-direction: column;
-    align-items: flex-start;      /* left edge */
-    justify-content: flex-start;  /* top edge */
-    padding: 12vh 8vw; 
+    align-items: flex-start;
+    /* left edge */
+    justify-content: flex-start;
+    /* top edge */
+    padding: 12vh 8vw;
     opacity: 0;
     transform: translateY(30px);
     will-change: opacity, transform;
@@ -689,13 +648,11 @@ body.lenis-revealed .site-navbar:not(.scrolled) .navbar-btn-primary:hover {
 
 /* “Playground” — white with dark shadow cutout */
 .seg1-hero-word {
-    background: linear-gradient(
-        to right,
-        #ffffff   10%,
-        #00c2b2   38%,
-        #2dd4bf   55%,
-        #ffffff   90%
-    );
+    background: linear-gradient(to right,
+            #ffffff 10%,
+            #008a89 38%,
+            #00c4c3 55%,
+            #ffffff 90%);
     background-size: 200% auto;
     background-clip: text;
     -webkit-background-clip: text;
@@ -705,7 +662,9 @@ body.lenis-revealed .site-navbar:not(.scrolled) .navbar-btn-primary:hover {
 }
 
 @keyframes seg1-shine {
-    to { background-position: 200% center; }
+    to {
+        background-position: 200% center;
+    }
 }
 
 /* ============================================
@@ -752,34 +711,44 @@ body.lenis-revealed .site-navbar:not(.scrolled) .navbar-btn-primary:hover {
    DRIVING DECISIONS — black-to-teal animated pill
    ============================================ */
 @keyframes teal-shift {
-    0%   { background-position: 0% 50%; }
-    100% { background-position: 200% 50%; }
+    0% {
+        background-position: 0% 50%;
+    }
+
+    100% {
+        background-position: 200% 50%;
+    }
 }
 
 /* ============================================
    CTA VIEW DEMO — pulse glow animation
    ============================================ */
 @keyframes cta-pulse {
-    0%, 100% { box-shadow: 0 4px 24px rgba(13,148,136,0.35), 0 0 0 0 rgba(13,148,136,0.4); }
-    50%       { box-shadow: 0 4px 32px rgba(13,148,136,0.55), 0 0 0 10px rgba(13,148,136,0); }
+
+    0%,
+    100% {
+        box-shadow: 0 4px 24px rgba(0, 138, 137, 0.35), 0 0 0 0 rgba(0, 138, 137, 0.4);
+    }
+
+    50% {
+        box-shadow: 0 4px 32px rgba(0, 138, 137, 0.55), 0 0 0 10px rgba(0, 138, 137, 0);
+    }
 }
 
 .cta-email-submit:hover {
-    background: #0d9488 !important;
+    background: #008a89 !important;
 }
 
 .driving-pill {
-    background: linear-gradient(
-        90deg,
-        #111111 0%,
-        #0a3a36 30%,
-        #0d9488 60%,
-        #111111 100%
-    );
+    background: linear-gradient(90deg,
+            #111111 0%,
+            #0a3a36 30%,
+            #008a89 60%,
+            #111111 100%);
     background-size: 250% 100%;
     animation: teal-shift 3.5s ease-in-out infinite alternate;
     color: #ffffff;
-    box-shadow: 0 2px 20px rgba(0,0,0,0.18);
+    box-shadow: 0 2px 20px rgba(0, 0, 0, 0.18);
     overflow: hidden;
 }
 
@@ -794,6 +763,7 @@ body.lenis-revealed .site-navbar:not(.scrolled) .navbar-btn-primary:hover {
     display: flex;
     flex-direction: column;
     align-items: center;
+    gap: 0;
 }
 
 .signal-pointer--up {
@@ -861,9 +831,11 @@ body.lenis-revealed .site-navbar:not(.scrolled) .navbar-btn-primary:hover {
         transform: scale(0.4);
         opacity: 0.85;
     }
+
     60% {
         opacity: 0.2;
     }
+
     100% {
         transform: scale(4.0);
         opacity: 0;
@@ -1149,21 +1121,28 @@ body.lenis-revealed .site-navbar:not(.scrolled) .navbar-btn-primary:hover {
     right: 7%;
 }
 
+.sp-weather-panel {
+    margin-top: -2px;
+    /* Pull flush against the downward line */
+}
+
 /* Segment 1 — Vegetation: bottom-left, signal-pointer--up (dot below, panel above) */
 .sp-vegetation {
-    bottom: 8%;
+    bottom: 10%;
     left: 2%;
 }
 
-/* Extend the vegetation line to span most of the viewport height */
+/* Extend the vegetation line to touch the radial lens border precisely */
 .sp-vegetation .signal-line {
-    height: 240px;
+    height: 100px;
 }
 
 /* Override: vegetation panel has no glass styles — VegetationWidget handles its own card */
 .sp-vegetation-panel {
     min-width: 0;
     max-width: none;
+    margin-bottom: -16px;
+    /* Pull down into the line to touch the radial lens */
 }
 
 /* Segment 2 — Sentiment: center, pointing down */
@@ -1184,6 +1163,11 @@ body.lenis-revealed .site-navbar:not(.scrolled) .navbar-btn-primary:hover {
     left: 5%;
 }
 
+.sp-footfall-panel {
+    margin-bottom: -4px;
+    /* Pull flush against upward line */
+}
+
 /* Segment 2 — Market Intelligence: dot on LEFT, pointer goes right to card */
 /* ═ TRIAL KNOBS ═ edit top/left to move the pulse dot ══════════════════════
 /* Segment 2 — Market Intelligence: card on LEFT, dot to the RIGHT of card */
@@ -1192,18 +1176,37 @@ body.lenis-revealed .site-navbar:not(.scrolled) .navbar-btn-primary:hover {
    left: 32%   — horizontal: dot sits to the right of the MI card
    ═══════════════════════════════════════════════════ */
 .sp-marketintel {
-    top: 10%;
-    left: 5%;
+    top: 5%;
+    left: 0%;
 }
 
 .sp-marketintel .signal-line {
-    width: 40px; /* MI_LINE_WIDTH — length of connector line */
+    width: 50px;
+    /* MI_LINE_WIDTH — length of connector line */
+}
+
+.sp-marketintel-panel {
+    min-width: 0;
+    max-width: none;
+    padding: 0;
+    margin-left: 0px;
+    /* Pull flush against leftward line */
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
 }
 
 /* Segment 3 — Parking Analytics: bottom-RIGHT, signal-pointer--up */
 .sp-parking {
     bottom: 12%;
     right: 5%;
+}
+
+.sp-parking-panel {
+    margin-bottom: -4px;
+    /* Pull flush against upward line */
 }
 
 /* Segment 2 — Competitor: left side, pointing down */
@@ -1284,15 +1287,15 @@ body.lenis-revealed .site-navbar:not(.scrolled) .navbar-btn-primary:hover {
 .urb-widget-container {
     position: absolute;
     bottom: auto;
-    left:   auto;
-    top:    4%;
-    right:  4%;
+    left: auto;
+    top: 4%;
+    right: 4%;
     width: 920px;
     transform: scale(0.95);
     transform-origin: bottom left;
     pointer-events: none;
     will-change: opacity;
-    filter: drop-shadow(0 32px 64px rgba(0,0,0,0.9)) drop-shadow(0 8px 24px rgba(0,0,0,0.7));
+    filter: drop-shadow(0 32px 64px rgba(0, 0, 0, 0.9)) drop-shadow(0 8px 24px rgba(0, 0, 0, 0.7));
 }
 
 /* ============================================
@@ -1732,12 +1735,13 @@ body.lenis-revealed .site-navbar:not(.scrolled) .navbar-btn-primary:hover {
     font-size: 0.95rem;
     letter-spacing: 0.02em;
     text-decoration: none;
-    box-shadow: 0 0 40px rgba(0,195,137,0.3), 0 4px 20px rgba(0,0,0,0.4);
+    box-shadow: 0 0 40px rgba(0, 195, 137, 0.3), 0 4px 20px rgba(0, 0, 0, 0.4);
     transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
+
 .cta-demo-btn:hover {
     transform: scale(1.04);
-    box-shadow: 0 0 60px rgba(0,195,137,0.45), 0 6px 28px rgba(0,0,0,0.5);
+    box-shadow: 0 0 60px rgba(0, 195, 137, 0.45), 0 6px 28px rgba(0, 0, 0, 0.5);
 }
 
 /* ============================================
@@ -1822,50 +1826,327 @@ body.lenis-revealed .site-navbar:not(.scrolled) .navbar-btn-primary:hover {
         --section-padding-y: var(--section-padding-y-mobile);
     }
 
-    .navbar-container {
-        padding: 1rem 5vw;
+    /* ── NAVBAR — Mobile Hamburger Layout ── */
+    .site-navbar {
+        height: 60px;
     }
 
-    .navbar-links {
-        display: none;
+    .navbar-container {
+        padding: 0 5vw;
     }
 
     .navbar-left {
-        gap: 1rem;
+        display: none !important;
+    }
+
+    .navbar-right {
+        display: none !important;
+    }
+
+    .navbar-center {
+        position: relative;
+        left: 0;
+        transform: none;
     }
 
     .navbar-logo img {
-        height: 20px;
+        height: 24px;
     }
 
-    .navbar-btn {
-        padding: 0.6rem 1.2rem;
-        font-size: 0.7rem;
+    .navbar-hamburger {
+        display: flex !important;
+    }
+
+    /* ── HERO — Mobile scaling ── */
+    .seg0-text {
+        padding: 10vh 5vw;
+    }
+
+    .seg0-line-1 {
+        font-size: clamp(1.4rem, 5vw, 2rem);
     }
 
     .seg0-line-2 {
         font-size: clamp(2.2rem, 8vw, 3.2rem);
     }
 
+    .seg1-headline {
+        top: 16%;
+    }
+
     .seg1-line-1 {
-        font-size: clamp(0.7rem, 2.5vw, 1rem);
-        letter-spacing: 0.15em;
+        font-size: clamp(0.65rem, 2.5vw, 0.9rem);
+        letter-spacing: 0.12em;
     }
 
     .seg1-line-2 {
-        font-size: clamp(2.2rem, 8vw, 3.4rem);
+        font-size: clamp(2rem, 7.5vw, 3rem);
     }
 
+    /* Segment 6 */
+    .seg6-text {
+        top: 22%;
+    }
+
+    .seg6-strip {
+        flex-wrap: wrap;
+        gap: 0;
+        bottom: 14%;
+    }
+
+    .seg6-strip-item {
+        font-size: 0.6rem;
+        padding: 0.35rem 0.8rem;
+    }
+
+    /* Glass panels — smaller on mobile */
     .glass-panel {
-        min-width: 148px;
-        max-width: 190px;
-        padding: 0.8rem 0.9rem;
+        min-width: 130px;
+        max-width: 170px;
+        padding: 0.65rem 0.75rem;
+        border-radius: 14px 18px 12px 16px;
     }
 
     .sp-data-val {
-        font-size: clamp(1.35rem, 5vw, 1.75rem);
+        font-size: clamp(1.15rem, 4.5vw, 1.5rem);
     }
 
+    .sp-data-unit {
+        font-size: 0.42rem;
+    }
+
+    .sp-data-sub {
+        gap: 0.3rem;
+        padding-top: 0.35rem;
+    }
+
+    .sp-sub-key, .sp-sub-val {
+        font-size: 0.5rem;
+    }
+
+    .glass-panel__label {
+        font-size: 0.45rem;
+        margin-bottom: 0.4rem;
+    }
+
+    .glass-panel__inner {
+        padding: 0.6rem 0.7rem;
+        border-radius: 8px 10px 7px 9px;
+    }
+
+    /* Signal pointers — hide heavy widgets on mobile */
+    .sp-vegetation {
+        display: none !important;
+    }
+
+    .sp-marketintel {
+        display: none !important;
+    }
+
+    .urb-widget-container {
+        display: none !important;
+    }
+
+    /* Reposition remaining signal pointers for mobile */
+    .sp-weather {
+        top: 8%;
+        right: 3%;
+    }
+
+    .sp-topo {
+        bottom: 22%;
+        left: 3%;
+    }
+
+    .sp-footfall {
+        bottom: 8%;
+        left: 3%;
+    }
+
+    .sp-parking {
+        bottom: 8%;
+        right: 3%;
+    }
+
+    .sp-sentiment {
+        top: 8%;
+        left: 28%;
+    }
+
+    .sp-topo-panel,
+    .sp-weather-panel {
+        min-width: 140px;
+        max-width: 180px;
+    }
+
+    .sp-weather-panel {
+        transform: none;
+    }
+
+    /* Census widget — hide on mobile (overlaps ActivateAgent) */
+    .census-widget-wrapper {
+        display: none !important;
+    }
+
+    .sp-footfall-panel,
+    .sp-parking-panel {
+        transform: none;
+    }
+
+    .sp-parking .sp-parking-panel {
+        transform-origin: bottom right;
+    }
+
+    /* Signal dot — disable heavy pulse animation */
+    .signal-dot::after {
+        animation: none;
+    }
+
+    .signal-dot {
+        width: 14px;
+        height: 14px;
+    }
+
+    .signal-dot::before {
+        width: 5px;
+        height: 5px;
+    }
+
+    /* Signal line — shorter on mobile */
+    .signal-pointer--up .signal-line,
+    .signal-pointer--down .signal-line {
+        height: 50px;
+    }
+
+    .signal-pointer--left .signal-line,
+    .signal-pointer--right .signal-line {
+        width: 36px;
+    }
+
+    /* Vegetation line override */
+    .sp-vegetation .signal-line {
+        height: 60px;
+    }
+
+    /* Clouds — allow overflow so smaller mobile clouds aren't clipped */
+    .hero-clouds {
+        overflow: visible !important;
+    }
+
+    /* Parallax columns — tighten and shrink images for narrow viewport */
+    .parallax-col-fl {
+        left: -1%;
+    }
+
+    .parallax-col-il {
+        left: 8%;
+    }
+
+    .parallax-col-ir {
+        right: 8%;
+    }
+
+    .parallax-col-fr {
+        right: -1%;
+    }
+
+    .parallax-col-outer .parallax-img {
+        width: clamp(55px, 6.5vw, 85px) !important;
+    }
+
+    .parallax-col-inner .parallax-img {
+        width: clamp(75px, 9vw, 120px) !important;
+    }
+
+    .parallax-col {
+        gap: 10px;
+    }
+
+    /* Lenis text block — position higher on mobile */
+    .lenis-text-block {
+        top: 73%;
+        width: 92%;
+        max-width: 480px;
+    }
+
+    .lenis-text-block h3 {
+        font-size: clamp(1.3rem, 5vw, 2rem);
+        margin-bottom: 1rem;
+    }
+
+    .lenis-text-block p {
+        font-size: clamp(0.82rem, 2.8vw, 0.95rem);
+        max-width: 400px;
+    }
+
+    /* Activate Agent — higher on mobile so it doesn't get cut off */
+    .activate-agent-wrapper {
+        bottom: 8%;
+    }
+
+    /* Demographics widget - hide on mobile */
+    .demographics-overlay {
+        display: none !important;
+    }
+
+    /* ── CASE STUDY SECTION — Stack to single column ── */
+    .cs2-grid {
+        grid-template-columns: 1fr !important;
+        gap: 32px !important;
+    }
+
+    .cs2-subtitle {
+        white-space: normal !important;
+    }
+
+    .cs2-left-panel {
+        order: -1;
+    }
+
+    .cs2-right-panel {
+        height: auto !important;
+        display: flex;
+        justify-content: center;
+    }
+
+    .cs2-header {
+        padding-left: 5vw !important;
+        padding-right: 5vw !important;
+    }
+
+    /* ── DIGITAL ATLAS MAP — Hide on mobile ── */
+    .digital-atlas-section {
+        display: none !important;
+    }
+
+    .atlas-glass-panel {
+        position: static !important;
+        width: 100% !important;
+        max-height: 420px;
+        overflow-y: auto;
+        border-radius: 0 0 24px 24px;
+        z-index: auto;
+    }
+
+    /* ── FOOTER CTA — Stack to single column ── */
+    .footer-cta-grid {
+        grid-template-columns: 1fr !important;
+        gap: 40px !important;
+    }
+
+    .footer-cta-grid > div {
+        text-align: center;
+    }
+
+    .footer-cta-grid > div:first-child {
+        align-items: center;
+    }
+
+    .footer-cta-grid > div:first-child p {
+        text-align: center;
+    }
+
+    /* ── GENERIC SECTIONS ── */
     .recommendation-strip {
         flex-wrap: wrap;
         gap: 0.5rem;
@@ -1889,7 +2170,6 @@ body.lenis-revealed .site-navbar:not(.scrolled) .navbar-btn-primary:hover {
         padding: var(--section-padding-y-mobile) 5vw;
     }
 
-    /* Full-width grid on mobile */
     .section-inner {
         display: block;
     }
@@ -1907,6 +2187,264 @@ body.lenis-revealed .site-navbar:not(.scrolled) .navbar-btn-primary:hover {
     .metric-value {
         font-size: clamp(2.5rem, 8vw, 3.5rem);
     }
+
+    /* Weather panel — compact */
+    .wp-temp {
+        font-size: 1.1rem;
+    }
+
+    .wp-icon {
+        width: 26px;
+        height: 26px;
+    }
+
+    /* Detail panel — smaller on mobile */
+    .detail-panel {
+        width: 180px;
+        top: 10%;
+    }
+
+    /* Marquee — tighter padding */
+    .marquee-container {
+        padding: 0.8rem 0;
+    }
+
+    .marquee-item {
+        padding: 0 1rem;
+        font-size: 0.6rem;
+    }
+
+    /* Newsletter — stack name fields on mobile */
+    .newsletter-name-row {
+        grid-template-columns: 1fr !important;
+    }
+
+    /* Industries page — mobile layouts */
+    .rt-intro {
+        flex-direction: column !important;
+    }
+
+    .rt-intro > div {
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+
+    .rt-caps-grid {
+        grid-template-columns: 1fr !important;
+    }
+
+    .rt-plan {
+        flex-direction: column !important;
+    }
+
+    .rt-plan > div {
+        width: 100% !important;
+    }
+
+    .rt-stats {
+        flex-direction: column !important;
+        gap: 24px !important;
+    }
+
+    .rt-stats > div {
+        width: 100% !important;
+    }
+
+    .oip-grid {
+        grid-template-columns: 1fr !important;
+    }
+
+    .oip-header-flex {
+        flex-direction: column !important;
+        gap: 24px !important;
+    }
+
+    .ind-workflow-wrap {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    /* IndustriesWidget — horizontal scroll tabs */
+    .industries-widget-tabs {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        max-width: 100%;
+    }
+    .industries-widget-tabs::-webkit-scrollbar { display: none; }
+
+    /* ── FOOTER ── */
+    .footer-bar {
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .footer-bar,
+    .footer-cta-grid {
+        word-break: break-word;
+        overflow-wrap: break-word;
+    }
+
+    #cta-footer {
+        overflow-x: hidden;
+    }
+
+    #cta-footer h2 {
+        font-size: clamp(2rem, 7vw, 3rem) !important;
+    }
+
+    .footer-cta-grid {
+        gap: 32px !important;
+    }
+
+    .footer-demo-link {
+        flex-wrap: wrap;
+    }
+}
+
+/* ── NAVBAR DRAWER — Mobile slide-out menu ── */
+.navbar-hamburger {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    z-index: 101;
+    position: relative;
+}
+
+.navbar-hamburger-bar {
+    display: block;
+    width: 20px;
+    height: 2px;
+    background: var(--text-primary);
+    border-radius: 2px;
+    transition: all 0.3s var(--ease-smooth);
+    position: absolute;
+}
+
+/* Dark mode hamburger */
+.site-navbar.nav-dark .navbar-hamburger-bar,
+.site-navbar.nav-hero .navbar-hamburger-bar {
+    background: rgba(255, 255, 255, 0.9);
+}
+
+.navbar-hamburger-bar:nth-child(1) {
+    transform: translateY(-6px);
+}
+
+.navbar-hamburger-bar:nth-child(2) {
+    transform: translateY(0);
+}
+
+.navbar-hamburger-bar:nth-child(3) {
+    transform: translateY(6px);
+}
+
+/* Hamburger → X animation when drawer is open */
+.navbar-hamburger.open .navbar-hamburger-bar:nth-child(1) {
+    transform: rotate(45deg);
+}
+
+.navbar-hamburger.open .navbar-hamburger-bar:nth-child(2) {
+    opacity: 0;
+}
+
+.navbar-hamburger.open .navbar-hamburger-bar:nth-child(3) {
+    transform: rotate(-45deg);
+}
+
+/* Force white bars when drawer is open */
+.navbar-hamburger.open .navbar-hamburger-bar {
+    background: rgba(255, 255, 255, 0.9);
+}
+
+/* The drawer overlay */
+.navbar-drawer {
+    position: fixed;
+    inset: 0;
+    z-index: 99;
+    background: rgba(8, 12, 10, 0.96);
+    backdrop-filter: blur(32px) saturate(180%);
+    -webkit-backdrop-filter: blur(32px) saturate(180%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(-10px);
+    transition: opacity 0.35s var(--ease-smooth), transform 0.35s var(--ease-smooth);
+}
+
+.navbar-drawer.open {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0);
+}
+
+.navbar-drawer-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: 20px 0;
+    font-family: var(--font-display);
+    font-size: 1.4rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.8);
+    text-decoration: none;
+    background: none;
+    border: none;
+    cursor: pointer;
+    transition: color 0.2s var(--ease-out);
+}
+
+.navbar-drawer-link:hover,
+.navbar-drawer-link:active {
+    color: #1cd2b3;
+}
+
+.navbar-drawer-divider {
+    width: 60px;
+    height: 1px;
+    background: rgba(255, 255, 255, 0.08);
+    margin: 8px 0;
+}
+
+.navbar-drawer-cta {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 28px;
+    padding: 14px 36px;
+    border-radius: 100px;
+    background: #1cd2b3;
+    color: #070d0b;
+    font-family: var(--font-body);
+    font-size: 0.82rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.15s;
+}
+
+.navbar-drawer-cta:hover {
+    background: #1ee8c4;
+}
+
+.navbar-drawer-cta:active {
+    transform: scale(0.97);
 }
 
 /* ============================================
@@ -1936,26 +2474,18 @@ body.lenis-revealed .site-navbar:not(.scrolled) .navbar-btn-primary:hover {
 
 /* Vibrant teal inner spotlight on border */
 [data-glow]::before {
-    background-image: radial-gradient(
-        calc(var(--spotlight-size) * 0.75) calc(var(--spotlight-size) * 0.75) at
-        calc(var(--x, 0) * 1px)
-        calc(var(--y, 0) * 1px),
-        hsl(var(--hue, 175) calc(var(--saturation, 100) * 1%) calc(var(--lightness, 45) * 1%) / var(--border-spot-opacity, 1)), transparent 100%
-    );
+    background-image: radial-gradient(calc(var(--spotlight-size) * 0.75) calc(var(--spotlight-size) * 0.75) at calc(var(--x, 0) * 1px) calc(var(--y, 0) * 1px),
+            hsl(var(--hue, 175) calc(var(--saturation, 100) * 1%) calc(var(--lightness, 45) * 1%) / var(--border-spot-opacity, 1)), transparent 100%);
     filter: brightness(2);
 }
 
 /* Softer white outer highlight */
 [data-glow]::after {
-    background-image: radial-gradient(
-        calc(var(--spotlight-size) * 0.5) calc(var(--spotlight-size) * 0.5) at
-        calc(var(--x, 0) * 1px)
-        calc(var(--y, 0) * 1px),
-        hsl(0 100% 100% / var(--border-light-opacity, 0.3)), transparent 100%
-    );
+    background-image: radial-gradient(calc(var(--spotlight-size) * 0.5) calc(var(--spotlight-size) * 0.5) at calc(var(--x, 0) * 1px) calc(var(--y, 0) * 1px),
+            hsl(0 100% 100% / var(--border-light-opacity, 0.3)), transparent 100%);
 }
 
-[data-glow] > [data-glow-inner] {
+[data-glow]>[data-glow-inner] {
     position: absolute;
     inset: 0;
     will-change: filter;
@@ -1972,16 +2502,35 @@ body.lenis-revealed .site-navbar:not(.scrolled) .navbar-btn-primary:hover {
     scrollbar-width: thin;
     scrollbar-color: rgba(255, 255, 255, 0.12) transparent;
 }
+
 .promo-scroll::-webkit-scrollbar {
     width: 3px;
 }
+
 .promo-scroll::-webkit-scrollbar-track {
     background: transparent;
 }
+
 .promo-scroll::-webkit-scrollbar-thumb {
     background: rgba(255, 255, 255, 0.12);
     border-radius: 99px;
 }
+
 .promo-scroll::-webkit-scrollbar-thumb:hover {
     background: rgba(255, 255, 255, 0.22);
+}
+
+/*Footer Word - Signal*/
+.footer-word {
+    background: linear-gradient(to right,
+            #37ffcd 10%,
+            #00a77d 38%,
+            #00ad82 55%,
+            #2fffcb 90%);
+    background-size: 200% auto;
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: seg1-shine 5s linear infinite;
+    filter: drop-shadow(0 2px 6px rgba(13, 148, 136, 0.25));
 }

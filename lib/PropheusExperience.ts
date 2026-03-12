@@ -1,7 +1,7 @@
-﻿import gsap from 'gsap';
+import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { getLenisInstance } from './SmoothScroll';
-import { HeroAnimationController, StateAnimations, AnimationConfig } from './HeroAnimationController';
+import { HeroAnimationController, StateAnimations, AnimationConfig, AnimationPreset } from './HeroAnimationController';
 
 /* ============================================
    PropheusExperience — Cinematic State Machine
@@ -81,7 +81,7 @@ export class PropheusExperience {
     private transitionEndTime = 0;
     private readonly SCROLL_WINDOW_MS = 600;
     private readonly WHEEL_GAP_MS = 200;
-    private readonly POST_TRANSITION_COOLDOWN_MS = 500;
+    private readonly POST_TRANSITION_COOLDOWN_MS = 200;
 
     // ========================================
     // LENIS SCROLL MODE (state 4)
@@ -105,7 +105,7 @@ export class PropheusExperience {
     // Applies to key presses, ActivateAgent advance/reverse.
     // Adjust this value for trial and error.
     // ========================================
-    private readonly INPUT_COOLDOWN_MS = 1000;
+    private readonly INPUT_COOLDOWN_MS = 600;
     private lastInputTime = 0;
 
     // ========================================
@@ -320,6 +320,40 @@ export class PropheusExperience {
             lineDir: 'vertical' | 'horizontal' = 'vertical',
         ) => {
             const parts = ['dot', 'line', 'panel', 'content'] as const;
+
+            // Determine slide direction based on pointer type
+            // The 'hide' state defines where the component sleeps.
+            // When 'show' triggers, it animates to distance: 0 (neutral).
+            // Example: pointer--down (Weather) -> line goes DOWN -> component is BELOW -> to meet line, it must slide UP -> so its sleep state is shifted DOWN.
+            const pointerEl = this.heroEl.querySelector(`.${prefix}`) as HTMLElement | null;
+            let panelSlideHideType: AnimationPreset = 'slideDown'; // default sleeps down
+            let contentSlideHideType: AnimationPreset = 'slideDown';
+
+            if (pointerEl) {
+                if (pointerEl.classList.contains('signal-pointer--up')) {
+                    // Line goes UP -> component is ABOVE -> slides DOWN to meet line -> sleep state is shifted UP
+                    panelSlideHideType = 'slideUp';
+                    contentSlideHideType = 'slideUp';
+                } else if (pointerEl.classList.contains('signal-pointer--left')) {
+                    // Line goes LEFT -> component is LEFT -> slides RIGHT to meet line -> sleep state is shifted LEFT
+                    panelSlideHideType = 'slideLeft';
+                    contentSlideHideType = 'slideLeft';
+                } else if (pointerEl.classList.contains('signal-pointer--right')) {
+                    // Line goes RIGHT -> component is RIGHT -> slides LEFT to meet line -> sleep state is shifted RIGHT
+                    panelSlideHideType = 'slideRight';
+                    contentSlideHideType = 'slideRight';
+                } else {
+                    // Default / pointer--down -> component is BELOW -> slides UP to meet line -> sleep state is shifted DOWN
+                    panelSlideHideType = 'slideDown';
+                    contentSlideHideType = 'slideDown';
+                }
+            }
+
+            // Line duration = 0.85s, starts at baseDelay + 0.52
+            // Line begins at 0.52 and finishes at ~1.37. Start the panel at 0.9 (halfway through line drawing) to feel fluid.
+            const panelDelay = baseDelay + 0.9;
+            const contentDelay = baseDelay + 1.05;
+
             const configs: Record<string, { type: string; show: AnimationConfig[]; hide: AnimationConfig[] }> = {
                 dot: {
                     type: 'dot',
@@ -341,25 +375,25 @@ export class PropheusExperience {
                 panel: {
                     type: 'panel',
                     show: [
-                        { type: 'fadeIn', opacity: 1, duration: 0.9, delay: baseDelay + 1.0, easing: 'power3.out' },
-                        { type: 'slideDown', distance: 0, duration: 0.9, delay: baseDelay + 1.0, easing: 'power3.out' },
-                        { type: 'scaleUp', scale: 1, duration: 0.9, delay: baseDelay + 1.0, easing: 'power3.out' },
+                        { type: 'fadeIn', opacity: 1, duration: 0.9, delay: panelDelay, easing: 'power3.out' },
+                        { type: panelSlideHideType, distance: 0, duration: 0.9, delay: panelDelay, easing: 'power3.out' },
+                        { type: 'scaleUp', scale: 1, duration: 0.9, delay: panelDelay, easing: 'power3.out' },
                     ],
                     hide: [
                         { type: 'fadeOut', opacity: 0, duration: 0.55, easing: 'power3.out' },
-                        { type: 'slideDown', distance: 10, duration: 0.55, easing: 'power3.out' },
+                        { type: panelSlideHideType, distance: 20, duration: 0.55, easing: 'power3.out' },
                         { type: 'scaleDown', scale: 0.97, duration: 0.55, easing: 'power3.out' },
                     ],
                 },
                 content: {
                     type: 'content',
                     show: [
-                        { type: 'fadeIn', opacity: 1, duration: 0.75, delay: baseDelay + 1.25, easing: 'power3.out' },
-                        { type: 'slideDown', distance: 0, duration: 0.75, delay: baseDelay + 1.25, easing: 'power3.out' },
+                        { type: 'fadeIn', opacity: 1, duration: 0.75, delay: contentDelay, easing: 'power3.out' },
+                        { type: contentSlideHideType, distance: 0, duration: 0.75, delay: contentDelay, easing: 'power3.out' },
                     ],
                     hide: [
                         { type: 'fadeOut', opacity: 0, duration: 0.55, easing: 'power3.out' },
-                        { type: 'slideDown', distance: 12, duration: 0.55, easing: 'power3.out' },
+                        { type: contentSlideHideType, distance: 15, duration: 0.55, easing: 'power3.out' },
                     ],
                 },
             };
@@ -441,19 +475,9 @@ export class PropheusExperience {
             });
         }
 
-        // ===== NAVBAR =====
-        // Visible at states 0 & 1, hidden from state 2 onwards
-        const navbar = document.querySelector('.site-navbar') as HTMLElement;
-        if (navbar) {
-            this.animController.registerElement('navbar', navbar);
-            this.animController.assignAnimations('navbar', {
-                state0: [{ type: 'fadeIn', opacity: 1, duration: 0 }],
-                state1: [{ type: 'fadeIn', opacity: 1, duration: 0.8, delay: 1.0, easing: 'power2.out' }],
-                state2: [{ type: 'fadeOut', opacity: 0, duration: 0.5, easing: 'power2.in' }],
-                state3: [{ type: 'fadeOut', opacity: 0, duration: 0.3 }],
-                state4: [{ type: 'fadeOut', opacity: 0, duration: 0.3 }],
-            });
-        }
+        // ===== NAVBAR — no longer registered here =====
+        // The Navbar component now self-manages visibility via IntersectionObserver
+        // and the body.lenis-scroll-mode CSS rule hides it during state 4.
     }
 
     /* ========================================
@@ -746,13 +770,13 @@ export class PropheusExperience {
         const rawProgress = Math.min(1, Math.max(0,
             (scrollY - this.lenisScrollStart) / this.LENIS_SCROLL_DISTANCE
         ));
-        // Smooth cubic ease-out: fast start, graceful slow finish
-        const progress = 1 - Math.pow(1 - rawProgress, 2.4);
+        // Use rawProgress directly for frame mapping — linear relationship
+        // between scroll position and canvas frame avoids perceived lag.
         const frame = this.LENIS_FRAME_START + rawProgress * (this.LENIS_FRAME_END - this.LENIS_FRAME_START);
         this.targetFrame = frame;
 
         // Drive the hero-to-page visual transition
-        this.updateLenisVisuals(progress);
+        this.updateLenisVisuals(rawProgress);
 
         // Let ActivateAgent fade its "Agent Activated" message
         window.dispatchEvent(new CustomEvent('propheus:lenis-progress', { detail: { progress: rawProgress } }));
@@ -808,10 +832,20 @@ export class PropheusExperience {
         const stickyEl = this.heroEl.querySelector('.hero-sticky') as HTMLElement;
         if (stickyEl) stickyEl.style.background = 'transparent';
 
+        // Prepare for height change — prevent browser reflow jank
+        this.heroEl.style.willChange = 'height';
+
         this.heroEl.style.height = `calc(100vh + ${this.LENIS_SCROLL_DISTANCE + this.LENIS_POST_BUFFER}px)`;
         // Recompute all ScrollTrigger positions after the layout shift so
         // downstream pinned sections (WorkflowStoryWidget) don't overlap the hero.
-        requestAnimationFrame(() => ScrollTrigger.refresh());
+        // Double-rAF ensures layout has fully settled before recalculation.
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+                ScrollTrigger.refresh();
+                // Remove will-change after layout settles to free GPU memory
+                this.heroEl.style.willChange = '';
+            });
+        });
         // Make canvas + overlays sticky
         if (stickyEl) {
             stickyEl.style.position = 'sticky';
@@ -973,7 +1007,7 @@ export class PropheusExperience {
        ======================================== */
     private startTicker(): void {
         this.tickerCallback = () => {
-            this.currentFrame += (this.targetFrame - this.currentFrame) * 0.1;
+            this.currentFrame += (this.targetFrame - this.currentFrame) * 0.15;
 
             const frameIndex = Math.min(
                 this.frameCount - 1,

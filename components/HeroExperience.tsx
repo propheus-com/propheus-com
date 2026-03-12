@@ -6,7 +6,7 @@ import ActivateAgent from '@/components/ActivateAgent';
 import { CloudCluster } from '@/components/CloudCluster';
 import WeatherWidget from '@/components/ui/WeatherWidget';
 import UrbanizationWidget from '@/components/ui/Urbanization';
-import { EventsCompetitorSentimentWidget } from '@/components/ui/MarketIntelligence';
+import { EventsCompetitorSentimentWidget, MobileMarketIntel } from '@/components/ui/MarketIntelligence';
 import VegetationWidget from '@/components/ui/VegetationWidget';
 import CensusWidget from '@/components/ui/CensusWidget';
 import FootfallCard from '@/components/ui/FootfallCard';
@@ -14,12 +14,14 @@ import { ParkingAnalyticsCard } from '@/components/ui/Parking Analytisc';
 import StoreMapMarkers from '@/components/ui/StoreMapMarkers';
 import DemographicsWidgetOverlay from '@/components/ui/DemographicsWidget';
 import LenisTextReveal from '@/components/ui/LenisTextReveal';
+import useIsMobile from '@/hooks/useIsMobile';
 
 export default function HeroExperience() {
     const heroRef = useRef<HTMLElement>(null);
     const mainCanvasRef = useRef<HTMLCanvasElement>(null);
     const ambientCanvasRef = useRef<HTMLCanvasElement>(null);
     const loadingBarRef = useRef<HTMLDivElement>(null);
+    const isMobile = useIsMobile();
 
     useEffect(() => {
         const heroEl = heroRef.current;
@@ -57,10 +59,10 @@ export default function HeroExperience() {
 
                     {/* Clouds layer — above canvas (z-1), below segment pointers (z-3) */}
                     <div className="hero-clouds-layer" aria-hidden="true">
-                        <div className="hero-clouds" style={{ position: 'absolute', inset: 0, overflow: 'hidden', pointerEvents: 'none' }}>
-                            <CloudCluster width={700} height={260} y="27%" speed={60} delay={-40} scale={1.1} seed={14} shadowX={25} shadowY={35} zIndex={1} opacity={0.7} />
-                            <CloudCluster width={400} height={250} y="50%" speed={50} delay={-4} scale={1.3} seed={42} shadowX={20} shadowY={30} zIndex={1} opacity={0.6} />
-                            <CloudCluster width={900} height={280} y="65%" speed={55} delay={-8} scale={0.9} seed={88} shadowX={15} shadowY={20} zIndex={1} opacity={0.45} />
+                        <div className="hero-clouds" style={{ position: 'absolute', inset: 0, overflow: 'visible', pointerEvents: 'none' }}>
+                            <CloudCluster width={isMobile ? 350 : 700} height={isMobile ? 130 : 260} y="27%" speed={60} delay={-40} scale={isMobile ? 0.7 : 1.1} seed={14} shadowX={25} shadowY={35} zIndex={1} opacity={0.7} />
+                            <CloudCluster width={isMobile ? 200 : 400} height={isMobile ? 125 : 250} y="50%" speed={50} delay={-4} scale={isMobile ? 0.8 : 1.3} seed={42} shadowX={20} shadowY={30} zIndex={1} opacity={0.6} />
+                            <CloudCluster width={isMobile ? 450 : 900} height={isMobile ? 140 : 280} y="65%" speed={55} delay={-8} scale={isMobile ? 0.6 : 0.9} seed={88} shadowX={15} shadowY={20} zIndex={1} opacity={0.45} />
                         </div>
                     </div>
 
@@ -72,7 +74,7 @@ export default function HeroExperience() {
                         Topo + Weather + StoreMapMarkers + Demographics come in
                        ============================ */}
                     <div className="segment-layer" aria-hidden="true">
-                        <StoreMapMarkers />
+                        <StoreMapMarkers isMobile={isMobile} />
 
                         <h1 className="seg1-headline">
                             <span className="seg1-line seg1-line-1">The Physical World</span>
@@ -93,7 +95,7 @@ export default function HeroExperience() {
                         </div>
 
                         {/* Census widget — bottom-right intelligence panel, self-managed visibility */}
-                        <div style={{ position: 'absolute', bottom: '4%', right: '8%', zIndex: 3, pointerEvents: 'none' }}>
+                        <div className="census-widget-wrapper" style={{ position: 'absolute', bottom: '4%', right: '8%', zIndex: 3, pointerEvents: 'none' }}>
                             <CensusWidget />
                         </div>
 
@@ -106,7 +108,7 @@ export default function HeroExperience() {
                             <div className="signal-line sp-weather-line" />
                             <div className="sp-weather-panel" style={{ background: 'none', border: 'none', padding: 0, backdropFilter: 'none', boxShadow: 'none' }}>
                                 <div className="signal-content sp-weather-content">
-                                    <WeatherWidget temperature={18} condition="clear" isDay={true} />
+                                    <WeatherWidget temperature={18} condition="clear" isDay={true} isMobile={isMobile} />
                                 </div>
                             </div>
                         </div>
@@ -132,6 +134,13 @@ export default function HeroExperience() {
                                 </div>
                             </div>
                         </div>
+
+                        {/* Mobile-only compact market intel */}
+                        {isMobile && (
+                            <div style={{ position: 'absolute', top: '8%', left: '3%', zIndex: 3, pointerEvents: 'none' }}>
+                                <MobileMarketIntel />
+                            </div>
+                        )}
                     </div>
 
                     {/* ============================
@@ -145,7 +154,7 @@ export default function HeroExperience() {
                             <div className="signal-line sp-footfall-line" />
                             <div className="sp-footfall-panel" style={{ background: 'none', border: 'none', padding: 0, backdropFilter: 'none', boxShadow: 'none' }}>
                                 <div className="signal-content sp-footfall-content">
-                                    <FootfallCard />
+                                    <FootfallCard isMobile={isMobile} />
                                 </div>
                             </div>
                         </div>
@@ -156,7 +165,7 @@ export default function HeroExperience() {
                             <div className="signal-line sp-parking-line" />
                             <div className="sp-parking-panel" style={{ background: 'none', border: 'none', padding: 0, backdropFilter: 'none', boxShadow: 'none' }}>
                                 <div className="signal-content sp-parking-content">
-                                    <ParkingAnalyticsCard />
+                                    <ParkingAnalyticsCard isMobile={isMobile} />
                                 </div>
                             </div>
                         </div>
@@ -211,7 +220,7 @@ export default function HeroExperience() {
                             {/* Centre text block — word-level reveal driven by lenis progress */}
                             <div className="lenis-text-block">
                                 <LenisTextReveal
-                                    heading="Physical Intelligence"
+                                    heading="Physical AI"
                                     body="AI Agents for every industry obsessed with ACTING in the real world. Powered by real-world intelligence that gives you the most comprehensive knowledge representation of every place on earth, curated to your unique context. 
 "
                                 />
@@ -221,7 +230,7 @@ export default function HeroExperience() {
                 </div>
 
                 {/* ActivateAgent — bottom-center hero controller */}
-                <ActivateAgent />
+                <ActivateAgent isMobile={isMobile} />
             </section>
         </>
     );

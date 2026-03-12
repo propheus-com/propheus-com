@@ -3,6 +3,7 @@
 import { useEffect, useRef } from 'react';
 import dynamic from 'next/dynamic';
 import gsap from 'gsap';
+import { BeamsBackground } from '@/components/ui/beams-background';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 gsap.registerPlugin(ScrollTrigger);
@@ -28,6 +29,17 @@ export default function DigitalAtlasSection() {
 
     useEffect(() => {
         const ctx = gsap.context(() => {
+            // Section wrapper — fades and rises into view
+            gsap.from(sectionRef.current, {
+                opacity: 0, y: 40,
+                scrollTrigger: {
+                    trigger: sectionRef.current,
+                    start: 'top 90%',
+                    end: 'top 65%',
+                    scrub: 0.8,
+                },
+            });
+
             // Eyebrow — slides in from left
             gsap.from(eyebrowRef.current, {
                 x: -50, opacity: 0,
@@ -109,29 +121,40 @@ export default function DigitalAtlasSection() {
     return (
         <section
             ref={sectionRef}
+            className="digital-atlas-section"
             style={{
-                background: '#fafafa',
+                background: '#080808',
                 padding: 'clamp(100px, 12vw, 160px) clamp(20px, 6vw, 80px)',
                 position: 'relative',
                 overflowX: 'hidden',
             }}
         >
-            {/* Subtle grid bg */}
+            {/* ── Beams background ── */}
+            <BeamsBackground
+                intensity="medium"
+                aria-hidden="true"
+                className="!absolute !inset-0 !h-full !w-full !pointer-events-none"
+                style={{ zIndex: 0 }}
+            />
+
+            {/* Subtle grid overlay — commented out
             <div
                 aria-hidden="true"
                 style={{
                     position: 'absolute',
                     inset: 0,
                     backgroundImage:
-                        'linear-gradient(rgba(0,0,0,0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,0.025) 1px, transparent 1px)',
+                        'linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px)',
                     backgroundSize: '64px 64px',
                     pointerEvents: 'none',
+                    zIndex: 1,
                     maskImage: 'radial-gradient(ellipse 80% 60% at 50% 50%, black 40%, transparent 100%)',
                     WebkitMaskImage: 'radial-gradient(ellipse 80% 60% at 50% 50%, black 40%, transparent 100%)',
                 }}
             />
+            */}
 
-            <div style={{ maxWidth: '1320px', margin: '0 auto', position: 'relative', zIndex: 1 }}>
+            <div style={{ maxWidth: '1320px', margin: '0 auto', position: 'relative', zIndex: 2 }}>
 
                 {/* ── Section header ── */}
                 <div style={{ marginBottom: 'clamp(56px, 7vw, 88px)', maxWidth: '720px' }}>
@@ -146,7 +169,7 @@ export default function DigitalAtlasSection() {
                             fontWeight: 700,
                             letterSpacing: '0.2em',
                             textTransform: 'uppercase',
-                            color: '#0d9488',
+                            color: '#008a89',
                             marginBottom: '24px',
                         }}
                     >
@@ -156,8 +179,8 @@ export default function DigitalAtlasSection() {
                                 width: '6px',
                                 height: '6px',
                                 borderRadius: '50%',
-                                background: '#0d9488',
-                                boxShadow: '0 0 10px rgba(13,148,136,0.4)',
+                                background: '#008a89',
+                                boxShadow: '0 0 10px rgba(0,138,137,0.4)',
                             }}
                         />
                         Location Intelligence
@@ -170,12 +193,12 @@ export default function DigitalAtlasSection() {
                             fontWeight: 800,
                             letterSpacing: '-0.04em',
                             lineHeight: 1.05,
-                            color: '#111111',
+                            color: '#f5f5f5',
                             margin: '0 0 24px',
                         }}
                     >
                         <span style={{ display: 'block', fontSize: 'clamp(2.8rem, 5.5vw, 5rem)' }}>The Digital Atlas.</span>
-                        <span style={{ display: 'block', fontSize: 'clamp(1.6rem, 3vw, 2.6rem)', color: '#999999', whiteSpace: 'nowrap' }}>Your operating system for action in the real world </span>
+                        <span style={{ display: 'block', fontSize: 'clamp(1.6rem, 3vw, 2.6rem)', color: 'rgba(255,255,255,0.32)', whiteSpace: 'nowrap' }}>Your operating system for action in the real world </span>
                     </h2>
 
                     <p
@@ -183,7 +206,7 @@ export default function DigitalAtlasSection() {
                         style={{
                             fontFamily: 'var(--font-body)',
                             fontSize: 'clamp(0.95rem, 1.4vw, 1.1rem)',
-                            color: '#555555',
+                            color: 'rgba(255,255,255,0.5)',
                             lineHeight: 1.7,
                             letterSpacing: '-0.01em',
                             maxWidth: '540px',
@@ -214,9 +237,10 @@ export default function DigitalAtlasSection() {
                                 gap: '10px',
                                 padding: '8px 16px',
                                 borderRadius: '999px',
-                                background: '#ffffff',
-                                border: '1px solid rgba(0,0,0,0.08)',
-                                boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
+                                background: 'rgba(255,255,255,0.05)',
+                                border: '1px solid rgba(255,255,255,0.1)',
+                                boxShadow: '0 1px 8px rgba(0,0,0,0.3)',
+                                backdropFilter: 'blur(8px)',
                             }}
                         >
                             <span
@@ -226,7 +250,7 @@ export default function DigitalAtlasSection() {
                                     borderRadius: '50%',
                                     background: color,
                                     flexShrink: 0,
-                                    boxShadow: `0 0 8px ${color}60`,
+                                    boxShadow: `0 0 8px ${color}80`,
                                 }}
                             />
                             <span
@@ -236,7 +260,7 @@ export default function DigitalAtlasSection() {
                                     fontWeight: 700,
                                     letterSpacing: '0.06em',
                                     textTransform: 'uppercase',
-                                    color: '#222222',
+                                    color: 'rgba(255,255,255,0.85)',
                                 }}
                             >
                                 {label}
@@ -245,7 +269,7 @@ export default function DigitalAtlasSection() {
                                 style={{
                                     fontFamily: 'var(--font-body)',
                                     fontSize: '0.72rem',
-                                    color: '#888888',
+                                    color: 'rgba(255,255,255,0.4)',
                                     fontWeight: 500,
                                 }}
                             >

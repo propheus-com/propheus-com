@@ -1,0 +1,50 @@
+/* ══════════════════════════════════════════════════════════
+   CardSwap.css — Propheus design system edition
+   Faithfully implements the provided spec with dark theme
+   adjustments to match our component system.
+══════════════════════════════════════════════════════════ */
+
+.card-swap-container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    transform-origin: center center;
+
+    perspective: 900px;
+    overflow: visible;
+}
+
+.card {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    background: #0d0d0d;
+
+    transform-style: preserve-3d;
+    will-change: transform;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    overflow: hidden;
+    cursor: pointer;
+}
+
+/* ── Hover lift on individual cards (the front one responds) ── */
+.card:hover {
+    border-color: rgba(255, 255, 255, 0.18);
+}
+
+@media (max-width: 768px) {
+    .card-swap-container {
+        transform: translate(-50%, -50%) scale(0.78);
+    }
+}
+
+@media (max-width: 480px) {
+    .card-swap-container {
+        transform: translate(-50%, -50%) scale(0.58);
+    }
+}

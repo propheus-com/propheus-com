@@ -285,6 +285,7 @@ export default function DemographicsWidgetOverlay() {
 
   return (
     <div
+      className="demographics-overlay"
       style={{
         position: 'absolute',
         bottom: '3%',

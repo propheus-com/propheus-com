@@ -70,9 +70,10 @@ type GlowCardProps = {
     children: React.ReactNode;
     className?: string;
     isActive?: boolean;
+    dark?: boolean;
 };
 
-const GlowCard = ({ children, className = '', isActive = false }: GlowCardProps) => {
+const GlowCard = ({ children, className = '', isActive = false, dark = false }: GlowCardProps) => {
     const cardRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
@@ -91,11 +92,15 @@ const GlowCard = ({ children, className = '', isActive = false }: GlowCardProps)
         <div
             ref={cardRef}
             style={{
-                backgroundImage: `radial-gradient(400px 400px at calc(var(--x, 0) * 1px) calc(var(--y, 0) * 1px), rgba(13,148,136,${isActive ? '0.05' : '0.02'}), transparent)`,
-                backgroundColor: 'transparent',
-                border: `1px solid ${isActive ? 'rgba(13,148,136,0.18)' : 'rgba(0,0,0,0.08)'}`,
+                backgroundImage: `radial-gradient(400px 400px at calc(var(--x, 0) * 1px) calc(var(--y, 0) * 1px), rgba(13,148,136,${isActive ? '0.08' : '0.03'}), transparent)`,
+                backgroundColor: dark ? 'rgba(255,255,255,0.04)' : 'transparent',
+                border: `1px solid ${isActive
+                    ? (dark ? 'rgba(255,255,255,0.14)' : 'rgba(13,148,136,0.18)')
+                    : (dark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)')}`,
                 position: 'relative',
-                boxShadow: isActive ? '0 8px 48px rgba(13,148,136,0.14), 0 4px 20px rgba(0,0,0,0.18)' : '0 4px 28px rgba(0,0,0,0.14), 0 1px 8px rgba(0,0,0,0.08)',
+                boxShadow: isActive
+                    ? (dark ? '0 8px 64px rgba(0,0,0,0.5), 0 4px 24px rgba(13,148,136,0.1)' : '0 8px 48px rgba(13,148,136,0.14), 0 4px 20px rgba(0,0,0,0.18)')
+                    : (dark ? '0 4px 28px rgba(0,0,0,0.4)' : '0 4px 28px rgba(0,0,0,0.14), 0 1px 8px rgba(0,0,0,0.08)'),
                 transition: 'border-color 0.6s ease, box-shadow 0.6s ease',
             } as React.CSSProperties}
             className={`rounded-[24px] overflow-hidden ${className}`}
@@ -109,7 +114,7 @@ const GlowCard = ({ children, className = '', isActive = false }: GlowCardProps)
 
 type IngestionItem = { icon: React.ComponentType<{ className?: string }>; label: string };
 
-const DataIngestionSystem = ({ items, active, theme = 'teal' }: { items: IngestionItem[]; active: boolean; theme?: 'teal' | 'red' }) => {
+const DataIngestionSystem = ({ items, active, theme = 'teal', dark = false }: { items: IngestionItem[]; active: boolean; theme?: 'teal' | 'red'; dark?: boolean }) => {
     const isTeal = theme === 'teal';
     const activeColor = isTeal ? '#14b8a6' : '#f43f5e';
 
@@ -122,19 +127,19 @@ const DataIngestionSystem = ({ items, active, theme = 'teal' }: { items: Ingesti
                     return (
                         <div
                             key={i}
-                            className={`absolute ${positions[i]} w-full h-[40px] flex items-center gap-2.5 px-3 rounded-[10px] border bg-white`}
+                            className={`absolute ${positions[i]} w-full h-[40px] flex items-center gap-2.5 px-3 rounded-[10px] border ${dark ? 'bg-[#1e1e20]' : 'bg-white'}`}
                             style={{
                                 opacity: active ? 1 : 0.3,
                                 transform: 'translateX(0)',
                                 transition: `opacity 0.6s cubic-bezier(0,0,0.2,1) ${i * 0.1}s, border-color 0.7s ease, box-shadow 0.7s ease`,
-                                borderColor: active ? 'rgb(229,231,235)' : 'rgb(243,244,246)',
-                                boxShadow: active ? '0 4px 16px rgba(0,0,0,0.12), 0 1px 4px rgba(0,0,0,0.06)' : '0 1px 6px rgba(0,0,0,0.05)',
+                                borderColor: active ? (dark ? 'rgba(255,255,255,0.12)' : 'rgb(229,231,235)') : (dark ? 'rgba(255,255,255,0.05)' : 'rgb(243,244,246)'),
+                                boxShadow: active ? (dark ? '0 4px 16px rgba(0,0,0,0.5), 0 1px 4px rgba(0,0,0,0.3)' : '0 4px 16px rgba(0,0,0,0.12), 0 1px 4px rgba(0,0,0,0.06)') : (dark ? '0 1px 6px rgba(0,0,0,0.3)' : '0 1px 6px rgba(0,0,0,0.05)'),
                             }}
                         >
-                            <div style={{ color: active && isTeal ? '#14b8a6' : active && !isTeal ? '#fb7185' : '#e5e7eb', transition: 'color 0.7s ease' }}>
+                            <div style={{ color: active && isTeal ? '#14b8a6' : active && !isTeal ? '#fb7185' : (dark ? 'rgba(255,255,255,0.2)' : '#e5e7eb'), transition: 'color 0.7s ease' }}>
                                 <Icon className="w-4 h-4" />
                             </div>
-                            <span style={{ fontSize: 10, fontWeight: 600, letterSpacing: '-0.02em', lineHeight: 1, color: active ? '#1f2937' : '#d1d5db', transition: 'color 0.7s ease' }}>{item.label}</span>
+                            <span style={{ fontSize: 10, fontWeight: 600, letterSpacing: '-0.02em', lineHeight: 1, color: active ? (dark ? 'rgba(255,255,255,0.85)' : '#1f2937') : (dark ? 'rgba(255,255,255,0.2)' : '#d1d5db'), transition: 'color 0.7s ease' }}>{item.label}</span>
                         </div>
                     );
                 })}
@@ -143,7 +148,7 @@ const DataIngestionSystem = ({ items, active, theme = 'teal' }: { items: Ingesti
             <svg className="absolute left-[120px] top-0 w-[120px] h-full pointer-events-none" viewBox="0 0 120 160" preserveAspectRatio="none">
                 {[20, 80, 140].map((y, idx) => (
                     <React.Fragment key={idx}>
-                        <path d={`M 0 ${y} C 60 ${y}, 60 80, 120 80`} fill="none" stroke="rgba(0,0,0,0.07)" strokeWidth="1" strokeDasharray="3 4" />
+                        <path d={`M 0 ${y} C 60 ${y}, 60 80, 120 80`} fill="none" stroke={dark ? 'rgba(255,255,255,0.07)' : 'rgba(0,0,0,0.07)'} strokeWidth="1" strokeDasharray="3 4" />
                         {active && (
                             <path
                                 d={`M 0 ${y} C 60 ${y}, 60 80, 120 80`}
@@ -171,36 +176,38 @@ type FlowNodeProps = {
     failed?: boolean;
     theme?: 'teal' | 'red';
     transitionDelay?: number;
+    dark?: boolean;
 };
 
-const FlowNode = ({ icon: IconComponent, title, subtitle, active, failed = false, theme = 'teal', transitionDelay = 0 }: FlowNodeProps) => {
+const FlowNode = ({ icon: IconComponent, title, subtitle, active, failed = false, theme = 'teal', transitionDelay = 0, dark = false }: FlowNodeProps) => {
     const isTeal = theme === 'teal';
 
     const iconColor = active && isTeal && !failed ? '#14b8a6'
         : active && failed ? '#f43f5e'
-        : active ? '#374151'
-        : '#e5e7eb';
+        : active ? (dark ? 'rgba(255,255,255,0.7)' : '#374151')
+        : (dark ? 'rgba(255,255,255,0.15)' : '#e5e7eb');
     const iconBorder = active && isTeal && !failed ? 'rgba(20,184,166,0.2)'
         : active && failed ? 'rgba(244,63,94,0.2)'
-        : active ? 'rgba(0,0,0,0.12)'
-        : 'rgba(0,0,0,0.05)';
+        : active ? (dark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.12)')
+        : (dark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)');
     const titleColor = active && isTeal && !failed ? '#0d9488'
         : active && failed ? '#f43f5e'
-        : active ? '#111827' : '#d1d5db';
+        : active ? (dark ? 'rgba(255,255,255,0.88)' : '#111827')
+        : (dark ? 'rgba(255,255,255,0.15)' : '#d1d5db');
 
     return (
         <div
-            className="relative flex flex-col items-center justify-center p-4 rounded-[18px] border w-40 h-[130px] flex-shrink-0 z-10 bg-white"
+            className={`relative flex flex-col items-center justify-center p-4 rounded-[18px] border w-40 h-[130px] flex-shrink-0 z-10 ${dark ? 'bg-[#1e1e20]' : 'bg-white'}`}
             style={{
                 opacity: active ? 1 : 0.32,
                 transform: active ? 'scale(1) translateY(0)' : 'scale(0.97) translateY(0)',
                 transition: `opacity 0.65s cubic-bezier(0,0,0.2,1) ${transitionDelay}s, transform 0.65s cubic-bezier(0,0,0.2,1) ${transitionDelay}s, border-color 0.6s ease, box-shadow 0.6s ease`,
-                borderColor: active ? 'rgb(229,231,235)' : 'rgb(243,244,246)',
-                boxShadow: active ? '0 6px 24px rgba(0,0,0,0.14), 0 2px 8px rgba(0,0,0,0.08)' : '0 2px 12px rgba(0,0,0,0.07)',
+                borderColor: active ? (dark ? 'rgba(255,255,255,0.12)' : 'rgb(229,231,235)') : (dark ? 'rgba(255,255,255,0.05)' : 'rgb(243,244,246)'),
+                boxShadow: active ? (dark ? '0 6px 24px rgba(0,0,0,0.6), 0 2px 8px rgba(0,0,0,0.4)' : '0 6px 24px rgba(0,0,0,0.14), 0 2px 8px rgba(0,0,0,0.08)') : (dark ? '0 2px 12px rgba(0,0,0,0.4)' : '0 2px 12px rgba(0,0,0,0.07)'),
             }}
         >
             <div
-                className="w-10 h-10 rounded-xl flex items-center justify-center mb-3 border bg-gray-50"
+                className={`w-10 h-10 rounded-xl flex items-center justify-center mb-3 border ${dark ? 'bg-[#2a2a2c]' : 'bg-gray-50'}`}
                 style={{
                     color: iconColor,
                     borderColor: iconBorder,
@@ -213,7 +220,7 @@ const FlowNode = ({ icon: IconComponent, title, subtitle, active, failed = false
             <h4 style={{ fontSize: 13, fontWeight: 700, letterSpacing: '-0.02em', lineHeight: 1.2, textAlign: 'center', color: titleColor, transition: 'color 0.7s ease' }}>
                 {title}
             </h4>
-            <p style={{ fontSize: 9, fontWeight: 500, letterSpacing: '0.04em', textAlign: 'center', marginTop: 6, color: active ? '#6b7280' : '#d1d5db', transition: 'color 0.7s ease' }}>
+            <p style={{ fontSize: 9, fontWeight: 500, letterSpacing: '0.04em', textAlign: 'center', marginTop: 6, color: active ? (dark ? 'rgba(255,255,255,0.42)' : '#6b7280') : (dark ? 'rgba(255,255,255,0.15)' : '#d1d5db'), transition: 'color 0.7s ease' }}>
                 {subtitle}
             </p>
         </div>
@@ -222,12 +229,19 @@ const FlowNode = ({ icon: IconComponent, title, subtitle, active, failed = false
 
 // â”€â”€â”€ Data Bus â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-const DataBus = ({ active, theme = 'teal', transitionDelay = 0 }: { active: boolean; theme?: 'teal' | 'red'; transitionDelay?: number }) => {
+const DataBus = ({ active, theme = 'teal', transitionDelay = 0, dark = false }: { active: boolean; theme?: 'teal' | 'red'; transitionDelay?: number; dark?: boolean }) => {
     const isTeal = theme === 'teal';
     return (
         <div className="flex-1 h-[2px] relative mx-[-10px] z-0 flex items-center min-w-[30px]">
             <div className="absolute inset-0 w-full h-full overflow-hidden">
-                <div className={`w-full h-full ${!isTeal ? 'border-b-[2px] border-dashed border-gray-300' : 'bg-gray-200 rounded-full'}`} />
+                <div
+                    className="w-full h-full"
+                    style={{
+                        borderBottom: !isTeal ? `2px dashed ${dark ? 'rgba(255,255,255,0.1)' : 'rgb(209,213,219)'}` : 'none',
+                        background: isTeal ? (dark ? 'rgba(255,255,255,0.1)' : 'rgb(229,231,235)') : 'none',
+                        borderRadius: isTeal ? '9999px' : '0',
+                    }}
+                />
             </div>
             <div
                 className="absolute inset-0 h-full origin-left rounded-full z-10"
@@ -268,7 +282,7 @@ const StatusBadge = ({ active, theme = 'teal', label }: { active: boolean; theme
     );
 };
 
-export default function WorkflowStoryWidget() {
+export default function WorkflowStoryWidget({ dark = false }: { dark?: boolean }) {
     const [stage, setStage] = useState(0);
     const rootRef = useRef<HTMLDivElement>(null);
 
@@ -338,63 +352,90 @@ export default function WorkflowStoryWidget() {
             <div ref={rootRef} className="relative w-full max-w-[1280px] mx-auto flex flex-col gap-4" style={{ fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Inter', sans-serif", WebkitFontSmoothing: 'antialiased' }}>
 
                 {/* Legacy Track — always active */}
-                <GlowCard className="p-5 px-7" isActive>
+                <GlowCard className="p-5 px-7" isActive dark={dark}>
                     <div>
                         <div className="flex items-center justify-between mb-2.5">
                             <div className="flex items-center gap-2">
-                                <h3 className="text-[13px] font-bold text-gray-800 tracking-tight">The Old Flow</h3>
+                                <h3
+                                    className="text-[13px] font-bold tracking-tight"
+                                    style={{ color: dark ? 'rgba(255,255,255,0.9)' : '#1f2937' }}
+                                >The Old Flow</h3>
                             </div>
-                            <span className="text-[11px] text-gray-400 tracking-tight font-medium">Reaction-based · Always late</span>
+                            <span
+                                className="text-[11px] tracking-tight font-medium"
+                                style={{ color: dark ? 'rgba(255,255,255,0.38)' : '#9ca3af' }}
+                            >Reaction-based · Always late</span>
                         </div>
-                        <div style={{ zoom: 0.78, transformOrigin: 'left top' }}>
+                        <div className="overflow-x-auto no-scrollbar" style={{ WebkitOverflowScrolling: 'touch' }}>
+                        <div style={{ minWidth: '700px' }}>
                             <div className="flex items-center w-full relative h-[160px]">
-                                <DataIngestionSystem theme="red" active items={legacyItems} />
-                                <FlowNode theme="red" icon={DatabaseIcon} title="Data Dump" subtitle="Cold storage" active transitionDelay={0} />
-                                <DataBus theme="red" active transitionDelay={0.02} />
-                                <FlowNode theme="red" icon={ProcessIcon} title="Analytics Team" subtitle="Interpretation lag" active transitionDelay={0.02} />
-                                <DataBus theme="red" active transitionDelay={0.02} />
-                                <FlowNode theme="red" icon={DelayIcon} title="Late Recommendations" subtitle="Market gap" active transitionDelay={0.1} />
-                                <DataBus theme="red" active transitionDelay={0.02} />
-                                <FlowNode theme="red" icon={FailIcon} title="Lost Opportunity" subtitle="Action window closed" active failed transitionDelay={0.02} />
+                                <DataIngestionSystem theme="red" active items={legacyItems} dark={dark} />
+                                <FlowNode theme="red" icon={DatabaseIcon} title="Data Dump" subtitle="Cold storage" active transitionDelay={0} dark={dark} />
+                                <DataBus theme="red" active transitionDelay={0.02} dark={dark} />
+                                <FlowNode theme="red" icon={ProcessIcon} title="Analytics Team" subtitle="Interpretation lag" active transitionDelay={0.02} dark={dark} />
+                                <DataBus theme="red" active transitionDelay={0.02} dark={dark} />
+                                <FlowNode theme="red" icon={DelayIcon} title="Late Recommendations" subtitle="Market gap" active transitionDelay={0.1} dark={dark} />
+                                <DataBus theme="red" active transitionDelay={0.02} dark={dark} />
+                                <FlowNode theme="red" icon={FailIcon} title="Lost Opportunity" subtitle="Action window closed" active failed transitionDelay={0.02} dark={dark} />
                             </div>
+                        </div>
                         </div>
                     </div>
                 </GlowCard>
 
                 {/* VS Divider — always visible */}
                 <div className="flex items-center gap-3 px-2">
-                    <div className="flex-1 h-px bg-gradient-to-r from-transparent via-gray-200 to-transparent" />
+                    <div className="flex-1 h-px" style={{ background: dark ? 'linear-gradient(to right, transparent, rgba(255,255,255,0.12), transparent)' : 'linear-gradient(to right, transparent, #e5e7eb, transparent)' }} />
                     <div style={{
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
                         width: 32, height: 32, borderRadius: '50%',
-                        background: 'white', border: '1px solid rgba(0,0,0,0.1)',
-                        boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+                        background: dark ? '#1a1a1a' : 'white',
+                        border: `1px solid ${dark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}`,
+                        boxShadow: dark ? '0 2px 8px rgba(0,0,0,0.4)' : '0 2px 8px rgba(0,0,0,0.08)',
                         fontSize: 9, fontWeight: 800, letterSpacing: '0.05em',
-                        color: '#6b7280',
+                        color: dark ? 'rgba(255,255,255,0.5)' : '#6b7280',
                     }}>VS</div>
-                    <div className="flex-1 h-px bg-gradient-to-r from-transparent via-gray-200 to-transparent" />
+                    <div className="flex-1 h-px" style={{ background: dark ? 'linear-gradient(to right, transparent, rgba(255,255,255,0.12), transparent)' : 'linear-gradient(to right, transparent, #e5e7eb, transparent)' }} />
                 </div>
 
                 {/* Propheus Track — always active */}
-                <GlowCard className="p-8 py-10" isActive>
+                <GlowCard className="p-8 py-10" isActive dark={dark}>
                     <div className="flex items-center justify-between mb-8">
                         <div className="flex items-center gap-3">
-                            <h3 className="text-[36px] font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-gray-900 to-teal-500">
+                            <h3
+                                className="text-[36px] font-extrabold tracking-tight"
+                                style={{
+                                    WebkitBackgroundClip: 'text',
+                                    WebkitTextFillColor: 'transparent',
+                                    backgroundImage: dark
+                                        ? 'linear-gradient(to right, #ffffff 0%, #14b8a6 100%)'
+                                        : 'linear-gradient(to right, #111827 0%, #14b8a6 100%)',
+                                    backgroundClip: 'text',
+                                }}
+                            >
                                 Your Superpower
                             </h3>
-                            <span className="text-[14px] text-gray-400 tracking-tight font-medium self-end mb-1.5">— Propheus</span>
+                            <span
+                                className="text-[14px] tracking-tight font-medium self-end mb-1.5"
+                                style={{ color: dark ? 'rgba(255,255,255,0.38)' : '#9ca3af' }}
+                            >— Propheus</span>
                         </div>
-                        <span className="text-[11px] text-gray-400 tracking-tight font-medium">Real-time · AI-driven</span>
+                        <span
+                            className="text-[11px] tracking-tight font-medium"
+                            style={{ color: dark ? 'rgba(255,255,255,0.38)' : '#9ca3af' }}
+                        >Real-time · AI-driven</span>
                     </div>
-                    <div style={{ zoom: 1.15, transformOrigin: 'left top' }}>
+                    <div className="overflow-x-auto no-scrollbar" style={{ WebkitOverflowScrolling: 'touch' }}>
+                    <div style={{ minWidth: '800px' }}>
                         <div className="flex items-center w-full relative h-[160px]">
-                            <DataIngestionSystem theme="teal" active items={prophItems} />
-                            <FlowNode theme="teal" icon={AiEngineIcon} title="AI Engine" subtitle="Real-time logic" active transitionDelay={0} />
-                            <DataBus theme="teal" active transitionDelay={0.02} />
-                            <FlowNode theme="teal" icon={PriorityIcon} title="Recommendations" subtitle="Impact by priority" active transitionDelay={0.02} />
-                            <DataBus theme="teal" active transitionDelay={0.02} />
-                            <FlowNode theme="teal" icon={CheckCircleIcon} title="Action Executed" subtitle="Direct automation" active transitionDelay={0.02} />
+                            <DataIngestionSystem theme="teal" active items={prophItems} dark={dark} />
+                            <FlowNode theme="teal" icon={AiEngineIcon} title="AI Engine" subtitle="Real-time logic" active transitionDelay={0} dark={dark} />
+                            <DataBus theme="teal" active transitionDelay={0.02} dark={dark} />
+                            <FlowNode theme="teal" icon={PriorityIcon} title="Recommendations" subtitle="Impact by priority" active transitionDelay={0.02} dark={dark} />
+                            <DataBus theme="teal" active transitionDelay={0.02} dark={dark} />
+                            <FlowNode theme="teal" icon={CheckCircleIcon} title="Action Executed" subtitle="Direct automation" active transitionDelay={0.02} dark={dark} />
                         </div>
+                    </div>
                     </div>
                 </GlowCard>
 

@@ -8,7 +8,7 @@ const HS_ENDPOINT  = `https://api.hsforms.com/submissions/v3/integration/submit/
 
 type State = 'idle' | 'loading' | 'success' | 'error';
 
-export default function NewsletterForm() {
+export default function NewsletterForm({ dark = false }: { dark?: boolean }) {
     const [firstname, setFirstname] = useState('');
     const [lastname,  setLastname]  = useState('');
     const [email,     setEmail]     = useState('');
@@ -33,7 +33,7 @@ export default function NewsletterForm() {
                     ],
                     context: {
                         pageUri:  typeof window !== 'undefined' ? window.location.href : '',
-                        pageName: 'Propheus — Signal Intelligence Platform',
+                        pageName: 'Propheus',
                     },
                 }),
             });
@@ -57,9 +57,9 @@ export default function NewsletterForm() {
     if (state === 'success') {
         return (
             <div style={{
-                border: '1px solid rgba(13,148,136,0.25)',
+                border: `1px solid ${dark ? 'rgba(41,255,201,0.2)' : 'rgba(13,148,136,0.25)'}`,
                 borderRadius: '12px',
-                background: 'rgba(13,148,136,0.04)',
+                background: dark ? 'rgba(41,255,201,0.06)' : 'rgba(13,148,136,0.04)',
                 padding: '24px 20px',
                 display: 'flex',
                 alignItems: 'center',
@@ -67,19 +67,19 @@ export default function NewsletterForm() {
             }}>
                 <div style={{
                     width: '36px', height: '36px', borderRadius: '50%',
-                    background: 'rgba(13,148,136,0.12)',
+                    background: dark ? 'rgba(41,255,201,0.14)' : 'rgba(13,148,136,0.12)',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                     flexShrink: 0,
                 }}>
                     <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                        <path d="M2.5 8l4 4 7-7" stroke="#0d9488" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                        <path d="M2.5 8l4 4 7-7" stroke={dark ? '#29ffc9' : '#0d9488'} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
                     </svg>
                 </div>
                 <div>
-                    <p style={{ fontFamily: 'var(--font-body)', fontSize: '0.9rem', fontWeight: 600, color: '#111', margin: '0 0 2px', letterSpacing: '-0.01em' }}>
+                    <p style={{ fontFamily: 'var(--font-body)', fontSize: '0.9rem', fontWeight: 600, color: dark ? '#fff' : '#111', margin: '0 0 2px', letterSpacing: '-0.01em' }}>
                         You&apos;re on the list.
                     </p>
-                    <p style={{ fontFamily: 'var(--font-body)', fontSize: '0.8rem', color: '#888', margin: 0, lineHeight: 1.5 }}>
+                    <p style={{ fontFamily: 'var(--font-body)', fontSize: '0.8rem', color: dark ? 'rgba(255,255,255,0.5)' : '#888', margin: 0, lineHeight: 1.5 }}>
                         We&apos;ll be in touch with exclusive insights and early access.
                     </p>
                 </div>
@@ -90,14 +90,15 @@ export default function NewsletterForm() {
     return (
         <form onSubmit={handleSubmit} noValidate style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
             {/* Name row */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+            <div className="newsletter-name-row" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
                 <input
                     type="text"
                     placeholder="First name"
                     aria-label="First name"
                     value={firstname}
                     onChange={e => setFirstname(e.target.value)}
-                    style={inputStyle}
+                    className={dark ? 'newsletter-dark-input' : ''}
+                    style={dark ? darkInputStyle : lightInputStyle}
                 />
                 <input
                     type="text"
@@ -105,17 +106,18 @@ export default function NewsletterForm() {
                     aria-label="Last name"
                     value={lastname}
                     onChange={e => setLastname(e.target.value)}
-                    style={inputStyle}
+                    className={dark ? 'newsletter-dark-input' : ''}
+                    style={dark ? darkInputStyle : lightInputStyle}
                 />
             </div>
 
             {/* Email + submit row */}
             <div style={{
                 display: 'flex',
-                border: '1px solid #e0e0e0',
+                border: `1px solid ${dark ? 'rgba(255,255,255,0.1)' : '#e0e0e0'}`,
                 borderRadius: '12px',
-                background: '#fff',
-                boxShadow: '0 2px 20px rgba(0,0,0,0.06)',
+                background: dark ? 'rgba(255,255,255,0.04)' : '#fff',
+                boxShadow: dark ? '0 2px 20px rgba(0,0,0,0.3)' : '0 2px 20px rgba(0,0,0,0.06)',
                 overflow: 'hidden',
             }}>
                 <input
@@ -125,13 +127,14 @@ export default function NewsletterForm() {
                     required
                     value={email}
                     onChange={e => setEmail(e.target.value)}
+                    className={dark ? 'newsletter-dark-input' : ''}
                     style={{
                         flex: 1, border: 'none', outline: 'none',
                         background: 'transparent',
                         padding: '14px 18px',
                         fontFamily: 'var(--font-body)',
                         fontSize: '0.9rem',
-                        color: '#111',
+                        color: dark ? '#fff' : '#111',
                         letterSpacing: '-0.01em',
                         minWidth: 0,
                     }}
@@ -139,21 +142,24 @@ export default function NewsletterForm() {
                 <button
                     type="submit"
                     disabled={state === 'loading'}
+                    className={dark ? 'newsletter-submit-dark' : ''}
                     style={{
                         flexShrink: 0,
-                        background: state === 'loading' ? '#555' : '#111',
-                        color: '#fff',
-                        border: 'none',
+                        background: state === 'loading'
+                            ? (dark ? 'rgba(41,255,201,0.4)' : '#555')
+                            : (dark ? '#1cd2b3' : '#111'),
+                        color: dark ? '#070d0b' : '#fff',
+                        border: dark ? '1px solid transparent' : 'none',
                         borderRadius: '8px',
                         margin: '5px',
                         padding: '9px 18px',
                         fontFamily: 'var(--font-body)',
                         fontSize: '0.82rem',
-                        fontWeight: 600,
+                        fontWeight: 700,
                         letterSpacing: '0.03em',
                         cursor: state === 'loading' ? 'not-allowed' : 'pointer',
                         whiteSpace: 'nowrap',
-                        transition: 'background 0.18s',
+                        transition: 'background 0.18s, box-shadow 0.25s, border-color 0.25s',
                     }}
                 >
                     {state === 'loading' ? 'Sending…' : 'Get early access'}
@@ -171,11 +177,25 @@ export default function NewsletterForm() {
                     {errorMsg}
                 </p>
             )}
+
+            {dark && (
+                <style>{`
+                    .newsletter-submit-dark:hover:not(:disabled) {
+                        box-shadow: 0 0 16px rgba(28,210,179,0.45), 0 0 0 1px rgba(28,210,179,0.3) !important;
+                        border-color: rgba(28,210,179,0.5) !important;
+                        background: #1ee8c4 !important;
+                    }
+                    .newsletter-dark-input:focus {
+                        border-color: rgba(255,255,255,0.2) !important;
+                        box-shadow: 0 0 0 2px rgba(28,210,179,0.12), 0 1px 12px rgba(0,0,0,0.2) !important;
+                    }
+                `}</style>
+            )}
         </form>
     );
 }
 
-const inputStyle: React.CSSProperties = {
+const lightInputStyle: React.CSSProperties = {
     border: '1px solid #e0e0e0',
     borderRadius: '10px',
     background: '#fff',
@@ -189,3 +209,19 @@ const inputStyle: React.CSSProperties = {
     width: '100%',
     boxSizing: 'border-box',
 };
+
+const darkInputStyle: React.CSSProperties = {
+    border: '1px solid rgba(255,255,255,0.1)',
+    borderRadius: '10px',
+    background: 'rgba(255,255,255,0.05)',
+    padding: '12px 16px',
+    fontFamily: 'var(--font-body)',
+    fontSize: '0.88rem',
+    color: '#fff',
+    letterSpacing: '-0.01em',
+    outline: 'none',
+    boxShadow: '0 1px 12px rgba(0,0,0,0.2)',
+    width: '100%',
+    boxSizing: 'border-box',
+};
+

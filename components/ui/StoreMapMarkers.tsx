@@ -135,9 +135,9 @@ const MARKERS: MarkerDef[] = PLACED.map(([x, y], i) => ({
 
 // ─── Individual Marker ────────────────────────────────────────────────────────
 
-type MarkerProps = MarkerDef & { playKey: number };
+type MarkerProps = MarkerDef & { playKey: number; isMobile?: boolean };
 
-const StoreMarker = ({ name, logo, x, y, delay, playKey }: MarkerProps) => (
+const StoreMarker = ({ name, logo, x, y, delay, playKey, isMobile }: MarkerProps) => (
     <div
         style={{ left: `${x}%`, top: `calc(${y}% + 3px)`, position: 'absolute' }}
         className="flex flex-col items-center -translate-x-1/2 -translate-y-[calc(100%-6px)]"
@@ -148,19 +148,19 @@ const StoreMarker = ({ name, logo, x, y, delay, playKey }: MarkerProps) => (
             initial={{ opacity: 0, y: -18, filter: 'blur(6px)' }}
             animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
             transition={{ delay, duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
-            className="flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-white/20 bg-black backdrop-blur-sm shadow-[0_8px_20px_rgba(0,0,0,0.7)] z-20"
+            className={`flex items-center ${isMobile ? 'gap-1 px-2 py-1' : 'gap-2 px-3.5 py-1.5'} rounded-full border border-white/20 bg-black backdrop-blur-sm shadow-[0_8px_20px_rgba(0,0,0,0.7)] z-20`}
         >
-            <div className="text-white flex items-center justify-center">
+            <div className={`text-white flex items-center justify-center ${isMobile ? '[&_svg]:w-3 [&_svg]:h-3 [&_span]:text-[6px]' : ''}`}>
                 {logo}
             </div>
-            <div className="w-px h-3.5 bg-white/30" />
-            <span className="text-white text-[11px] font-bold tracking-wide uppercase">
+            <div className={`w-px ${isMobile ? 'h-2' : 'h-3.5'} bg-white/30`} />
+            <span className={`text-white ${isMobile ? 'text-[7px]' : 'text-[11px]'} font-bold tracking-wide uppercase`}>
                 {name}
             </span>
         </motion.div>
 
         {/* Anchor line */}
-        <div className="relative w-px h-7 overflow-hidden">
+        <div className={`relative w-px ${isMobile ? 'h-4' : 'h-7'} overflow-hidden`}>
             <motion.div
                 key={`line-${playKey}`}
                 initial={{ y: '-100%' }}
@@ -177,7 +177,7 @@ const StoreMarker = ({ name, logo, x, y, delay, playKey }: MarkerProps) => (
                 initial={{ scale: 0, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 transition={{ delay: delay + 0.55, type: 'spring', stiffness: 240, damping: 14 }}
-                className="w-[7px] h-[7px] bg-teal-400 rounded-full shadow-[0_0_10px_rgba(45,212,191,0.85)] z-10"
+                className={`${isMobile ? 'w-[5px] h-[5px]' : 'w-[7px] h-[7px]'} bg-teal-400 rounded-full shadow-[0_0_10px_rgba(45,212,191,0.85)] z-10`}
             />
             {/* Pulse ring */}
             <motion.div
@@ -190,7 +190,7 @@ const StoreMarker = ({ name, logo, x, y, delay, playKey }: MarkerProps) => (
                     duration: 2.6,
                     ease: [0.25, 0.1, 0.25, 1],
                 }}
-                className="absolute w-[7px] h-[7px] bg-teal-400 rounded-full"
+                className={`absolute ${isMobile ? 'w-[5px] h-[5px]' : 'w-[7px] h-[7px]'} bg-teal-400 rounded-full`}
             />
         </div>
     </div>
@@ -198,32 +198,54 @@ const StoreMarker = ({ name, logo, x, y, delay, playKey }: MarkerProps) => (
 
 // ─── Main Component ────────────────────────────────────────────────────────────
 
-export default function StoreMapMarkers() {
+export default function StoreMapMarkers({ isMobile = false }: { isMobile?: boolean }) {
     const [active, setActive] = useState(false);
     const [playKey, setPlayKey] = useState(0);
     const comingBack = useRef(false);
+    const currentStateRef = useRef(0);
 
     useEffect(() => {
         const onState2 = () => { comingBack.current = true; };
+        
+        // Eager show going forward
         const onEnter = () => {
-            if (comingBack.current) {
-                comingBack.current = false;
-                // Delay marker appearance when returning from state2 (reverse scroll illusion)
-                setTimeout(() => { setActive(true); setPlayKey(k => k + 1); }, 2000);
-            } else {
+            if (!comingBack.current) {
                 setActive(true);
                 setPlayKey(k => k + 1);
             }
         };
-        const onExit = () => setActive(false);
+        
+        const onExit = () => {
+            setActive(false);
+        };
+
+        // Definitive state-driven visibility
+        const onStateChange = (e: Event) => {
+            const { state } = (e as CustomEvent).detail;
+            currentStateRef.current = state;
+            
+            if (state === 1) {
+                // If settling back from a future state, this guarantees canvas has finished scrolling
+                if (comingBack.current) {
+                    comingBack.current = false;
+                    setActive(true);
+                    setPlayKey(k => k + 1);
+                }
+            } else {
+                setActive(false);
+                comingBack.current = false;
+            }
+        };
 
         window.addEventListener('propheus:state2', onState2);
         window.addEventListener('propheus:state1', onEnter);
         window.addEventListener('propheus:state1:exit', onExit);
+        window.addEventListener('propheus:statechange', onStateChange);
         return () => {
             window.removeEventListener('propheus:state2', onState2);
             window.removeEventListener('propheus:state1', onEnter);
             window.removeEventListener('propheus:state1:exit', onExit);
+            window.removeEventListener('propheus:statechange', onStateChange);
         };
     }, []);
 
@@ -241,7 +263,7 @@ export default function StoreMapMarkers() {
             }}
         >
             {MARKERS.map(m => (
-                <StoreMarker key={m.id} {...m} playKey={playKey} />
+                <StoreMarker key={m.id} {...m} playKey={playKey} isMobile={isMobile} />
             ))}
         </div>
     );
