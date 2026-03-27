@@ -195,9 +195,23 @@ export default function ActivateAgent({ isMobile = false }: { isMobile?: boolean
             if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
             if (e.key === 'ArrowRight' || e.key === 'ArrowDown') { e.preventDefault(); handleLaunch(); }
         };
+        
+        let touchStartY = 0;
+        const onTouchStart = (e: TouchEvent) => { touchStartY = e.touches[0].clientY; };
+        const onTouchEnd = (e: TouchEvent) => {
+            if (touchStartY - e.changedTouches[0].clientY > 40) handleLaunch();
+        };
+
         window.addEventListener('wheel', onWheel, { passive: true });
+        window.addEventListener('touchstart', onTouchStart, { passive: true });
+        window.addEventListener('touchend', onTouchEnd, { passive: true });
         window.addEventListener('keydown', onKeydown);
-        return () => { window.removeEventListener('wheel', onWheel); window.removeEventListener('keydown', onKeydown); };
+        return () => { 
+            window.removeEventListener('wheel', onWheel); 
+            window.removeEventListener('touchstart', onTouchStart);
+            window.removeEventListener('touchend', onTouchEnd);
+            window.removeEventListener('keydown', onKeydown); 
+        };
     }, [status, handleLaunch]);
 
     // --- Scroll = nav (active) — delta-accumulator + queued-intent ---
@@ -209,21 +223,14 @@ export default function ActivateAgent({ isMobile = false }: { isMobile?: boolean
         if (status !== 'active') return;
         accumulatedDeltaRef.current = 0;
 
-        const onWheel = (e: WheelEvent) => {
-            // Reset gesture timer — after silence, accumulated delta resets
-            if (gestureTimerRef.current) clearTimeout(gestureTimerRef.current);
-            gestureTimerRef.current = setTimeout(() => {
-                accumulatedDeltaRef.current = 0;
-            }, GESTURE_RESET_MS);
-
+        const triggerIntent = (deltaY: number) => {
             // Guard against immediate scroll right after becoming active
             if (Date.now() - activeStartTimeRef.current < INPUT_COOLDOWN_MS) return;
 
             // Per-action cooldown: don't fire again too soon after last scroll action
             if (Date.now() - lastScrollActionRef.current < STEP_COOLDOWN_MS) {
                 // But still allow queueing during the cooldown if transitioning
-                // Accumulate delta so when cooldown expires, a queued intent is ready
-                accumulatedDeltaRef.current += e.deltaY;
+                accumulatedDeltaRef.current += deltaY;
                 if (Math.abs(accumulatedDeltaRef.current) >= DELTA_THRESHOLD && isTransitioningRef.current) {
                     const dir: 'next' | 'prev' = accumulatedDeltaRef.current > 0 ? 'next' : 'prev';
                     queuedDirectionRef.current = dir;
@@ -232,16 +239,13 @@ export default function ActivateAgent({ isMobile = false }: { isMobile?: boolean
                 return;
             }
 
-            // Accumulate delta with direction sign
-            accumulatedDeltaRef.current += e.deltaY;
+            accumulatedDeltaRef.current += deltaY;
 
-            // Check if threshold is crossed
             if (Math.abs(accumulatedDeltaRef.current) >= DELTA_THRESHOLD) {
                 const dir: 'next' | 'prev' = accumulatedDeltaRef.current > 0 ? 'next' : 'prev';
-                accumulatedDeltaRef.current = 0; // reset for next gesture
+                accumulatedDeltaRef.current = 0;
 
                 if (isTransitioningRef.current) {
-                    // Queue intent — will fire when current transition ends
                     queuedDirectionRef.current = dir;
                 } else {
                     lastScrollActionRef.current = Date.now();
@@ -250,9 +254,30 @@ export default function ActivateAgent({ isMobile = false }: { isMobile?: boolean
             }
         };
 
+        const onWheel = (e: WheelEvent) => {
+            if (gestureTimerRef.current) clearTimeout(gestureTimerRef.current);
+            gestureTimerRef.current = setTimeout(() => { accumulatedDeltaRef.current = 0; }, GESTURE_RESET_MS);
+            triggerIntent(e.deltaY);
+        };
+
+        let touchStartY = 0;
+        const onTouchStart = (e: TouchEvent) => { touchStartY = e.touches[0].clientY; };
+        const onTouchEnd = (e: TouchEvent) => {
+            const deltaY = touchStartY - e.changedTouches[0].clientY;
+            // Mobile swipes are often single distinct gestures, so we amplify the delta 
+            // so a decent swipe crosses the threshold immediately
+            if (Math.abs(deltaY) > 40) {
+                triggerIntent(deltaY > 0 ? DELTA_THRESHOLD : -DELTA_THRESHOLD);
+            }
+        };
+
         window.addEventListener('wheel', onWheel, { passive: true });
+        window.addEventListener('touchstart', onTouchStart, { passive: true });
+        window.addEventListener('touchend', onTouchEnd, { passive: true });
         return () => {
             window.removeEventListener('wheel', onWheel);
+            window.removeEventListener('touchstart', onTouchStart);
+            window.removeEventListener('touchend', onTouchEnd);
             if (gestureTimerRef.current) {
                 clearTimeout(gestureTimerRef.current);
                 gestureTimerRef.current = null;

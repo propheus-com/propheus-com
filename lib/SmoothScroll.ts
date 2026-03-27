@@ -21,6 +21,7 @@ export function initSmoothScroll(): Lenis {
         lerp: 0.14,
         duration: 1.0,
         smoothWheel: true,
+        syncTouch: true,
     });
 
     // Lenis scroll events feed ScrollTrigger

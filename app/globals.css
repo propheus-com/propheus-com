@@ -111,7 +111,7 @@ a {
     position: relative;
     width: 100vw;
     height: 100vh;
-    overflow: hidden;
+    overflow: visible;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -220,6 +220,16 @@ a {
     /* Individual GPU layer per image — prevents decode stutter during reveal */
     will-change: transform;
     transform: translateZ(0);
+}
+
+/* --- Parallax columns clip wrapper ---
+   Provides overflow: hidden scoped to the columns only.
+   hero-sticky uses overflow: visible so lenis-text-block can extend below 100vh. */
+.parallax-cols-clip {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
 }
 
 /* --- Centre text block --- */
@@ -548,7 +558,7 @@ body.lenis-scroll-mode .site-navbar {
     inset: 0;
     z-index: 3;
     pointer-events: none;
-    /* overflow intentionally omitted: hero-sticky clips the viewport */
+    /* overflow intentionally omitted: segment layers stay within viewport bounds */
 }
 
 /* ============================================

@@ -120,13 +120,11 @@ export function BeamsBackground({
       const pulsingOpacity =
         beam.opacity * (0.8 + Math.sin(beam.pulse) * 0.2) * opacityMap[intensity];
       const gradient = ctx.createLinearGradient(0, 0, 0, beam.length);
-      // Premium Teal Gradient for the pulsing beam
-        gradient.addColorStop(0, `hsla(180, 100%, 15%, 0)`);                   // Dark teal fade
-        gradient.addColorStop(0.1, `hsla(180, 100%, 30%, ${pulsingOpacity * 0.5})`);  // Deeper teal
-        gradient.addColorStop(0.4, `hsla(175, 100%, 50%, ${pulsingOpacity})`);        // Vibrant premium teal core
-        gradient.addColorStop(0.6, `hsla(175, 100%, 50%, ${pulsingOpacity})`);        // Sustained core
-        gradient.addColorStop(0.9, `hsla(180, 100%, 30%, ${pulsingOpacity * 0.5})`);  // Deeper teal
-        gradient.addColorStop(1, `hsla(180, 100%, 15%, 0)`);                   // Dark teal fade
+      // Premium Teal Gradient for the pulsing beam (4 stops — visually identical to 6, half the ops)
+        gradient.addColorStop(0,   `hsla(180, 100%, 15%, 0)`);
+        gradient.addColorStop(0.2, `hsla(175, 100%, 50%, ${pulsingOpacity})`);
+        gradient.addColorStop(0.8, `hsla(175, 100%, 50%, ${pulsingOpacity})`);
+        gradient.addColorStop(1,   `hsla(180, 100%, 15%, 0)`);
       ctx.fillStyle = gradient;
       ctx.fillRect(-beam.width / 2, 0, beam.width, beam.length);
       ctx.restore();
@@ -164,7 +162,7 @@ export function BeamsBackground({
       <canvas
         ref={canvasRef}
         className="absolute inset-0 w-full h-full"
-        style={{ filter: "blur(10px)" }}
+        style={{ filter: "blur(10px)", transform: "translateZ(0)", willChange: "filter" }}
       />
       {children}
     </div>

@@ -211,37 +211,41 @@ export default function HeroExperience() {
                     <div className="lenis-transition-layer">
                         <div className="lenis-bg" />
                         <div className="lenis-content">
-                            {/* Far-left column (outer — moves faster) */}
-                            <div className="parallax-col parallax-col-outer parallax-col-fl">
-                                <img className="parallax-img" src="/assets/examples/Store%20.webp" alt="" loading="eager" decoding="async" style={{ width: 'clamp(95px, 9vw, 145px)', aspectRatio: '5/6' }} />
-                                <img className="parallax-img" src="/assets/examples/telecom%20tower%20.webp" alt="" loading="eager" decoding="async" style={{ width: 'clamp(95px, 9vw, 145px)', aspectRatio: '4/5' }} />
-                                <img className="parallax-img" src="/assets/examples/satellite%20imagery%20.webp" alt="" loading="eager" decoding="async" style={{ width: 'clamp(95px, 9vw, 145px)', aspectRatio: '1/1' }} />
-                                <img className="parallax-img" src="/assets/examples/property.webp" alt="" loading="eager" decoding="async" style={{ width: 'clamp(95px, 9vw, 145px)', aspectRatio: '3/4' }} />
-                                <img className="parallax-img" src="/assets/examples/mines%20.webp" alt="" loading="eager" decoding="async" style={{ width: 'clamp(95px, 9vw, 145px)', aspectRatio: '5/7' }} />
-                            </div>
-                            {/* Inner-left column (inner — moves slower) */}
-                            <div className="parallax-col parallax-col-inner parallax-col-il">
-                                <img className="parallax-img" src="/assets/examples/streets.webp" alt="" loading="eager" decoding="async" style={{ width: 'clamp(130px, 12vw, 195px)', aspectRatio: '4/3' }} />
-                                <img className="parallax-img" src="/assets/examples/village.webp" alt="" loading="eager" decoding="async" style={{ width: 'clamp(130px, 12vw, 195px)', aspectRatio: '3/4' }} />
-                                <img className="parallax-img" src="/assets/examples/aerial%20view%20.webp" alt="" loading="eager" decoding="async" style={{ width: 'clamp(130px, 12vw, 195px)', aspectRatio: '5/4' }} />
-                                <img className="parallax-img" src="/assets/examples/forest%20.webp" alt="" loading="eager" decoding="async" style={{ width: 'clamp(130px, 12vw, 195px)', aspectRatio: '3/4' }} />
-                                <img className="parallax-img" src="/assets/examples/Road%20crossing.webp" alt="" loading="eager" decoding="async" style={{ width: 'clamp(130px, 12vw, 195px)', aspectRatio: '1/1' }} />
-                            </div>
-                            {/* Inner-right column (inner — moves slower) */}
-                            <div className="parallax-col parallax-col-inner parallax-col-ir">
-                                <img className="parallax-img" src="/assets/examples/Properties.webp" alt="" loading="eager" decoding="async" style={{ width: 'clamp(130px, 12vw, 195px)', aspectRatio: '3/4' }} />
-                                <img className="parallax-img" src="/assets/examples/aerial%20imagery.webp" alt="" loading="eager" decoding="async" style={{ width: 'clamp(130px, 12vw, 195px)', aspectRatio: '4/3' }} />
-                                <img className="parallax-img" src="/assets/examples/boardroom%20.webp" alt="" loading="eager" decoding="async" style={{ width: 'clamp(130px, 12vw, 195px)', aspectRatio: '3/4' }} />
-                                <img className="parallax-img" src="/assets/examples/Train%20.webp" alt="" loading="eager" decoding="async" style={{ width: 'clamp(130px, 12vw, 195px)', aspectRatio: '5/4' }} />
-                                <img className="parallax-img" src="/assets/examples/manufacturing.webp" alt="" loading="eager" decoding="async" style={{ width: 'clamp(130px, 12vw, 195px)', aspectRatio: '4/5' }} />
-                            </div>
-                            {/* Far-right column (outer — moves faster) */}
-                            <div className="parallax-col parallax-col-outer parallax-col-fr">
-                                <img className="parallax-img" src="/assets/examples/transactions.webp" alt="" loading="eager" decoding="async" style={{ width: 'clamp(95px, 9vw, 145px)', aspectRatio: '1/1' }} />
-                                <img className="parallax-img" src="/assets/examples/nasa-_SFJhRPzJHs-unsplash.webp" alt="" loading="eager" decoding="async" style={{ width: 'clamp(95px, 9vw, 145px)', aspectRatio: '5/6' }} />
-                                <img className="parallax-img" src="/assets/examples/Delivery%20.webp" alt="" loading="eager" decoding="async" style={{ width: 'clamp(95px, 9vw, 145px)', aspectRatio: '4/5' }} />
-                                <img className="parallax-img" src="/assets/examples/road%20.webp" alt="" loading="eager" decoding="async" style={{ width: 'clamp(95px, 9vw, 145px)', aspectRatio: '3/4' }} />
-                                <img className="parallax-img" src="/assets/examples/warehouse%20.webp" alt="" loading="eager" decoding="async" style={{ width: 'clamp(95px, 9vw, 145px)', aspectRatio: '5/7' }} />
+                            {/* Parallax columns clip wrapper — provides overflow: hidden for columns only,
+                                so the lenis-text-block (outside this wrapper) can overflow below the viewport */}
+                            <div className="parallax-cols-clip">
+                                {/* Far-left column (outer — moves faster) */}
+                                <div className="parallax-col parallax-col-outer parallax-col-fl">
+                                    <img className="parallax-img" src="/assets/examples/Store%20.webp" alt="" loading="eager" decoding="async" style={{ width: 'clamp(95px, 9vw, 145px)', aspectRatio: '5/6' }} />
+                                    <img className="parallax-img" src="/assets/examples/telecom%20tower%20.webp" alt="" loading="eager" decoding="async" style={{ width: 'clamp(95px, 9vw, 145px)', aspectRatio: '4/5' }} />
+                                    <img className="parallax-img" src="/assets/examples/satellite%20imagery%20.webp" alt="" loading="eager" decoding="async" style={{ width: 'clamp(95px, 9vw, 145px)', aspectRatio: '1/1' }} />
+                                    <img className="parallax-img" src="/assets/examples/property.webp" alt="" loading="eager" decoding="async" style={{ width: 'clamp(95px, 9vw, 145px)', aspectRatio: '3/4' }} />
+                                    <img className="parallax-img" src="/assets/examples/mines%20.webp" alt="" loading="eager" decoding="async" style={{ width: 'clamp(95px, 9vw, 145px)', aspectRatio: '5/7' }} />
+                                </div>
+                                {/* Inner-left column (inner — moves slower) */}
+                                <div className="parallax-col parallax-col-inner parallax-col-il">
+                                    <img className="parallax-img" src="/assets/examples/streets.webp" alt="" loading="eager" decoding="async" style={{ width: 'clamp(130px, 12vw, 195px)', aspectRatio: '4/3' }} />
+                                    <img className="parallax-img" src="/assets/examples/village.webp" alt="" loading="eager" decoding="async" style={{ width: 'clamp(130px, 12vw, 195px)', aspectRatio: '3/4' }} />
+                                    <img className="parallax-img" src="/assets/examples/aerial%20view%20.webp" alt="" loading="eager" decoding="async" style={{ width: 'clamp(130px, 12vw, 195px)', aspectRatio: '5/4' }} />
+                                    <img className="parallax-img" src="/assets/examples/forest%20.webp" alt="" loading="eager" decoding="async" style={{ width: 'clamp(130px, 12vw, 195px)', aspectRatio: '3/4' }} />
+                                    <img className="parallax-img" src="/assets/examples/Road%20crossing.webp" alt="" loading="eager" decoding="async" style={{ width: 'clamp(130px, 12vw, 195px)', aspectRatio: '1/1' }} />
+                                </div>
+                                {/* Inner-right column (inner — moves slower) */}
+                                <div className="parallax-col parallax-col-inner parallax-col-ir">
+                                    <img className="parallax-img" src="/assets/examples/Properties.webp" alt="" loading="eager" decoding="async" style={{ width: 'clamp(130px, 12vw, 195px)', aspectRatio: '3/4' }} />
+                                    <img className="parallax-img" src="/assets/examples/aerial%20imagery.webp" alt="" loading="eager" decoding="async" style={{ width: 'clamp(130px, 12vw, 195px)', aspectRatio: '4/3' }} />
+                                    <img className="parallax-img" src="/assets/examples/boardroom%20.webp" alt="" loading="eager" decoding="async" style={{ width: 'clamp(130px, 12vw, 195px)', aspectRatio: '3/4' }} />
+                                    <img className="parallax-img" src="/assets/examples/Train%20.webp" alt="" loading="eager" decoding="async" style={{ width: 'clamp(130px, 12vw, 195px)', aspectRatio: '5/4' }} />
+                                    <img className="parallax-img" src="/assets/examples/manufacturing.webp" alt="" loading="eager" decoding="async" style={{ width: 'clamp(130px, 12vw, 195px)', aspectRatio: '4/5' }} />
+                                </div>
+                                {/* Far-right column (outer — moves faster) */}
+                                <div className="parallax-col parallax-col-outer parallax-col-fr">
+                                    <img className="parallax-img" src="/assets/examples/transactions.webp" alt="" loading="eager" decoding="async" style={{ width: 'clamp(95px, 9vw, 145px)', aspectRatio: '1/1' }} />
+                                    <img className="parallax-img" src="/assets/examples/nasa-_SFJhRPzJHs-unsplash.webp" alt="" loading="eager" decoding="async" style={{ width: 'clamp(95px, 9vw, 145px)', aspectRatio: '5/6' }} />
+                                    <img className="parallax-img" src="/assets/examples/Delivery%20.webp" alt="" loading="eager" decoding="async" style={{ width: 'clamp(95px, 9vw, 145px)', aspectRatio: '4/5' }} />
+                                    <img className="parallax-img" src="/assets/examples/road%20.webp" alt="" loading="eager" decoding="async" style={{ width: 'clamp(95px, 9vw, 145px)', aspectRatio: '3/4' }} />
+                                    <img className="parallax-img" src="/assets/examples/warehouse%20.webp" alt="" loading="eager" decoding="async" style={{ width: 'clamp(95px, 9vw, 145px)', aspectRatio: '5/7' }} />
+                                </div>
                             </div>
                             {/* Centre text block — word-level reveal driven by lenis progress */}
                             <div className="lenis-text-block">

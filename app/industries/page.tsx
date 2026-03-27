@@ -107,17 +107,17 @@ const PLAN_ITEMS = [
     {
         tag: 'Weather',
         confidence: '94%',
-        action: 'Expect 30% footfall uplift Thu\u2013Sat. Pre-position ambient scented candles to front endcap.',
+        action: 'Expect 30% foot traffic uplift Thu\u2013Sat. Pre-position ambient scented candles to front endcap.',
     },
     {
         tag: 'Competitor',
         confidence: '89%',
-        action: 'Boots running 25% off fragrance Mon\u2013Fri. Match on selective gift sets only no blanket discount.',
+        action: 'Sephora running 25% off fragrance Mon\u2013Fri. Match on selective gift sets only no blanket discount.',
     },
     {
         tag: 'Event',
         confidence: '97%',
-        action: 'London Marathon passes 1.2km from store Sunday. Stock recovery drinks and sports nutrition by 8am.',
+        action: 'NYC Marathon passes 0.8mi from store Sunday. Stock recovery drinks and sports nutrition by 8am.',
     },
     {
         tag: 'Demand',
@@ -386,17 +386,17 @@ function RetailPanel({ panelKey }: { panelKey: number }) {
                         <div className="rt-plan-stores">
                             <div className="rt-plan-store-row">
                                 <span className="rt-plan-store-dot" style={{ background: '#008a89' }} />
-                                <span>Westfield Stratford</span>
+                                <span>The Grove</span>
                                 <span className="rt-plan-store-count">4 actions</span>
                             </div>
                             <div className="rt-plan-store-row">
                                 <span className="rt-plan-store-dot" style={{ background: '#818cf8' }} />
-                                <span>Oxford Street</span>
+                                <span>Fifth Avenue</span>
                                 <span className="rt-plan-store-count">3 actions</span>
                             </div>
                             <div className="rt-plan-store-row">
                                 <span className="rt-plan-store-dot" style={{ background: '#f59e0b' }} />
-                                <span>Canary Wharf</span>
+                                <span>Hudson Yards</span>
                                 <span className="rt-plan-store-count">5 actions</span>
                             </div>
                         </div>
@@ -409,7 +409,7 @@ function RetailPanel({ panelKey }: { panelKey: number }) {
                         <div className="rt-plan-card">
                             <div className="rt-plan-card-head">
                                 <span className="rt-plan-live-dot" />
-                                <span className="rt-plan-store-name">Westfield Stratford · Week 12</span>
+                                <span className="rt-plan-store-name">The Grove · Week 12</span>
                                 <span className="rt-plan-live-badge">Live</span>
                             </div>
                             <div className="rt-plan-items">
@@ -1583,7 +1583,7 @@ export default function IndustriesPage() {
     box-shadow: 0 0 32px rgba(0,138,137,0.22);
 }
 .rt-driving-inline {
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     display: flex;
     align-items: center;
     justify-content: flex-start;
@@ -1595,6 +1595,19 @@ export default function IndustriesPage() {
     border-radius: 10px;
     border: 1px solid #e5e5e7;
     box-sizing: border-box;
+}
+@media (max-width: 600px) {
+    .rt-driving-inline {
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        padding: 20px 16px;
+    }
+    .rt-di-word {
+        text-align: center;
+        font-size: clamp(0.95rem, 4vw, 1.1rem);
+    }
 }
 .rt-di-word {
     font-family: var(--font-display, 'Syne', sans-serif);

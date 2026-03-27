@@ -160,26 +160,9 @@ export class PropheusExperience {
   };
 
   private _onTouchEnd = (e: TouchEvent): void => {
-    if (!this.isHeroLocked) return;
-    const touchEndY = e.changedTouches[0].clientY;
-    const deltaY = this._touchStartY - touchEndY;
-
-    if (Math.abs(deltaY) < this.TOUCH_THRESHOLD) return;
-
-    const now = Date.now();
-    if (now - this.lastInputTime < this.INPUT_COOLDOWN_MS) return;
-
-    this.lastInputTime = now;
-
-    if (deltaY > 0) {
-      // Swipe Up -> advance
-      if (this.isAnimating) this.skipToEnd();
-      this.advanceState();
-    } else {
-      // Swipe Down -> reverse
-      if (this.isAnimating) this.skipToEnd();
-      this.reverseState();
-    }
+    // We no longer trigger state changes directly via touch.
+    // The ActivateAgent component handles touch gestures and emits
+    // 'propheus:advance' / 'propheus:reverse' to ensure UI text syncs properly.
   };
 
   /* Arrow keys: up/down advance/reverse state */
@@ -859,7 +842,13 @@ export class PropheusExperience {
     const to = from + 1;
 
     // State 3 is the last auto-scroll state; ActivateAgent "Exit Agent" enters Lenis
-    if (to > 3) return;
+    if (to > 3) {
+      if (this.heroState === 3) {
+        window.dispatchEvent(new CustomEvent("propheus:force-exit"));
+        window.dispatchEvent(new CustomEvent("propheus:exit-agent"));
+      }
+      return;
+    }
 
     this.isAnimating = true;
     console.log(`[State] ${from} → ${to}`);
@@ -1026,6 +1015,27 @@ export class PropheusExperience {
     }
   };
 
+  private _lenisTouchStartY = 0;
+  
+  private _onLenisTouchStart = (e: TouchEvent): void => {
+    if (!this.isLenisScrollMode || this.isAnimating) return;
+    this._lenisTouchStartY = e.touches[0].clientY;
+  };
+
+  private _onLenisTouchEnd = (e: TouchEvent): void => {
+    if (!this.isLenisScrollMode || this.isAnimating) return;
+    
+    // Only intercept if we are at the very top of the page
+    if (window.scrollY > 5) return;
+    
+    const touchEndY = e.changedTouches[0].clientY;
+    const deltaY = touchEndY - this._lenisTouchStartY; // positive means swiped down (intent to scroll up)
+
+    if (deltaY > this.TOUCH_THRESHOLD) {
+      this.exitLenisScrollModeReverse();
+    }
+  };
+
   private _onLenisScroll = (): void => {
     if (!this.isLenisScrollMode) return;
 
@@ -1176,6 +1186,8 @@ export class PropheusExperience {
 
     window.addEventListener("scroll", this._onLenisScroll, { passive: true });
     window.addEventListener("wheel", this._onLenisWheel, { passive: false });
+    window.addEventListener("touchstart", this._onLenisTouchStart, { passive: true });
+    window.addEventListener("touchend", this._onLenisTouchEnd, { passive: true });
     window.removeEventListener("scroll", this._onScrollBack);
 
     console.log("[Lenis] Scroll mode entered — frames 240→240");
@@ -1186,6 +1198,8 @@ export class PropheusExperience {
     this.lenisExitDone = false;
     window.removeEventListener("scroll", this._onLenisScroll);
     window.removeEventListener("wheel", this._onLenisWheel);
+    window.removeEventListener("touchstart", this._onLenisTouchStart);
+    window.removeEventListener("touchend", this._onLenisTouchEnd);
 
     // Remove dark-mode class from body
     document.body.classList.remove("lenis-scroll-mode");

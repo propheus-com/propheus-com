@@ -159,7 +159,7 @@ const GlassPanelInner = ({ children: panelChildren, isMobile = false }: { childr
                     backgroundColor: 'rgba(0, 0, 0, 0.98)',
                     border: '2px solid rgba(255, 255, 255, 0.12)',
                 }}
-                className="atlas-glass-panel absolute top-6 right-6 bottom-6 w-[420px] z-[2000] rounded-[44px] backdrop-blur-3xl shadow-[0_50px_120px_-30px_rgba(0,0,0,1)] flex flex-col overflow-hidden"
+                className="atlas-glass-panel absolute top-6 right-6 bottom-6 w-[420px] z-[2000] rounded-[44px] backdrop-blur-md shadow-[0_50px_120px_-30px_rgba(0,0,0,1)] flex flex-col overflow-hidden"
             >
                 <div className="relative z-10 flex flex-col h-full no-scrollbar overflow-y-auto">{panelChildren}</div>
         </motion.div>
@@ -342,10 +342,10 @@ export default function DigitalAtlas() {
                 /* Overview markers (Starbucks, Sephora, etc.) — always highest z */
                 .tooltip-shell--overview { z-index: 900 !important; }
 
-                .marker-wrapper { position: relative; width: var(--size); height: var(--size); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1); }
+                .marker-wrapper { position: relative; width: var(--size); height: var(--size); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1); will-change: transform; }
 
                 .marker-core { width: 14px; height: 14px; background: var(--color); border-radius: 50%; z-index: 2; box-shadow: 0 0 20px var(--color); border: 2.5px solid rgba(255,255,255,0.6); }
-                .marker-ring { position: absolute; inset: 0; border: 2px solid var(--color); border-radius: 50%; opacity: 0.45; transform: scale(0.7); }
+                .marker-ring { position: absolute; inset: 0; border: 2px solid var(--color); border-radius: 50%; opacity: 0.45; transform: scale(0.7); will-change: transform, opacity; }
 
                 /* Overview-specific: persistent double-ring radial pulse — slower, more elegant */
                 .is-overview .marker-core { width: 16px; height: 16px; box-shadow: 0 0 28px var(--color), 0 0 8px var(--color); }
@@ -383,8 +383,8 @@ export default function DigitalAtlas() {
                 `).join('\n')}
 
                 @keyframes slide-in-glass {
-                    from { opacity: 0; transform: translateX(-12px); filter: blur(6px); }
-                    to { opacity: 1; transform: translateX(0); filter: blur(0); }
+                    from { opacity: 0; transform: translateX(-12px); }
+                    to { opacity: 1; transform: translateX(0); }
                 }
 
                 .tooltip-shell, .sat-label-shell { background: transparent !important; border: none !important; box-shadow: none !important; }

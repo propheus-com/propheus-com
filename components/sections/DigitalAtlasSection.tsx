@@ -171,6 +171,7 @@ export default function DigitalAtlasSection() {
                             textTransform: 'uppercase',
                             color: '#008a89',
                             marginBottom: '24px',
+                            willChange: 'transform, opacity',
                         }}
                     >
                         <span
@@ -195,6 +196,7 @@ export default function DigitalAtlasSection() {
                             lineHeight: 1.05,
                             color: '#f5f5f5',
                             margin: '0 0 24px',
+                            willChange: 'transform, opacity',
                         }}
                     >
                         <span style={{ display: 'block', fontSize: 'clamp(2.8rem, 5.5vw, 5rem)' }}>The Digital Atlas.</span>
@@ -211,6 +213,7 @@ export default function DigitalAtlasSection() {
                             letterSpacing: '-0.01em',
                             maxWidth: '540px',
                             margin: 0,
+                            willChange: 'transform, opacity',
                         }}
                     >
                         Context-aware Physical AI Agents make that playground tangible, curating real-world signals like weather, people movement, demographics, and consumer sentiment into the most comprehensive representation of the world that impacts the way you operate.
@@ -225,6 +228,7 @@ export default function DigitalAtlasSection() {
                         flexWrap: 'wrap',
                         gap: '12px',
                         marginBottom: '28px',
+                        willChange: 'transform, opacity',
                     }}
                 >
                     {INTEL_TYPES.map(({ color, label, desc }) => (
@@ -236,10 +240,9 @@ export default function DigitalAtlasSection() {
                                 gap: '10px',
                                 padding: '8px 16px',
                                 borderRadius: '999px',
-                                background: 'rgba(255,255,255,0.05)',
+                                background: 'rgba(255,255,255,0.07)',
                                 border: '1px solid rgba(255,255,255,0.1)',
                                 boxShadow: '0 1px 8px rgba(0,0,0,0.3)',
-                                backdropFilter: 'blur(8px)',
                             }}
                         >
                             <span
@@ -279,7 +282,7 @@ export default function DigitalAtlasSection() {
                 </div>
 
                 {/* ── The atlas map — self-contained, no Lenis/ScrollTrigger inside ── */}
-                <div ref={mapWrapRef}>
+                <div ref={mapWrapRef} style={{ willChange: 'transform, opacity' }}>
                     <DigitalAtlas />
                 </div>
 
