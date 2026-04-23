@@ -59,6 +59,19 @@ body {
   content: none;
 }
 
+.story-hero-brand {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 22px;
+}
+
+.story-hero-brand img {
+  width: 220px;
+  height: auto;
+  object-fit: cover;
+}
+
 .story-hero-eyebrow {
   font-family: 'DM Mono', monospace;
   font-size: 11px;
@@ -883,43 +896,78 @@ footer b { color: rgba(255,255,255,0.8); }
   .reel-outer { flex-direction: column; gap: 32px; }
   .reel-sidebar { padding: 0; max-width: none; }
   .reel-carousel { max-width: 100%; }
+  .story-hero { padding: 72px 20px 84px; }
+  .story-hero-headline { font-size: clamp(30px, 9.5vw, 42px); }
+  .story-hero-sub { font-size: 15px; line-height: 1.65; }
+  .story-hero-dims { margin-top: 24px; }
+  .shd-pill { font-size: 11px; padding: 5px 11px; }
   .story-two-col, .story-three-col, .story-four-col { grid-template-columns: 1fr; }
   .story-hero-stats { grid-template-columns: 1fr 1fr; }
+  .story-hero-stat { padding: 20px 14px; }
+  .story-hero-stat-val { font-size: 32px; }
+  .story-content { padding: 44px 18px; }
+  .story-chapter { margin-bottom: 72px; }
+  .story-chapter-headline { font-size: clamp(24px, 7.4vw, 34px); }
+  .story-chapter-body { font-size: 15px; line-height: 1.7; margin-bottom: 28px; }
+  .corp-bars { gap: 12px; }
+  .corp-bar-row { gap: 10px; align-items: flex-start; }
+  .corp-bar-label { min-width: 56px; padding-top: 4px; }
+  .corp-bar-track { height: 30px; }
   .crisis-numbers { grid-template-columns: 1fr; gap: 20px; }
+  .crisis-callout { padding: 28px 20px; border-radius: 16px; margin: 28px 0; }
+  .crisis-callout::before { width: 180px; height: 180px; }
+  .crisis-callout-headline { font-size: 26px; }
+  .crisis-num-val { font-size: 46px; }
   .opp-grid { grid-template-columns: 1fr; }
+  .method-block { padding: 24px 18px; border-radius: 16px; }
   .method-vs { grid-template-columns: 1fr; }
+  .method-vs-divider { display: none; }
+  .walk-visual { grid-template-columns: 1fr; }
+  .walk-card { padding: 18px; }
+  .walk-circle { width: 44px; height: 44px; font-size: 16px; }
+  .walk-circle-text { font-size: 13px; }
   .dim-donut-wrap { grid-template-columns: 1fr; }
-  .story-content { padding: 48px 20px; }
+  .dim-section { margin-bottom: 36px; padding-bottom: 36px; }
+  .dim-section-header { align-items: flex-start; padding: 16px; gap: 12px; flex-wrap: wrap; }
+  .dim-section-count { margin-left: 0; text-align: left; width: 100%; }
+  .dim-count-num { font-size: 28px; }
+  .dim-narrative { font-size: 14px; line-height: 1.7; }
   .corp-bar-detail { display: none; }
   .dim-ward-examples { grid-template-columns: 1fr; }
   .dim-corp-row { gap: 6px; }
+  .mandate-item { grid-template-columns: 1fr; gap: 10px; padding: 20px 0; }
+  .mandate-num { font-size: 34px; }
+  .mandate-title { font-size: 17px; }
+  .mandate-desc { font-size: 14px; line-height: 1.65; }
   .atlas-method-grid { grid-template-columns: 1fr; }
+  .atlas-method-card { padding: 20px 16px; }
   .atlas-caveat-grid { grid-template-columns: 1fr; }
+  .atlas-caveats { padding: 20px 16px 16px; }
   .top-ward-card { grid-template-columns: 1fr; }
+  .top-ward-card { padding: 18px; }
   .top-ward-rank { display: none; }
-  .dim-callout { flex-direction: column; gap: 12px; }
+  .top-ward-header { flex-direction: column; gap: 8px; }
+  .top-ward-score { align-self: flex-start; }
+  .top-ward-name { font-size: 20px; }
+  .twd-label { min-width: 88px; }
+  .dim-callout { flex-direction: column; gap: 12px; padding: 18px; }
+  .dim-callout-num { font-size: 34px; }
+  footer { padding: 28px 20px; font-size: 12px; }
+  .animate-in { opacity: 1; transform: none; transition: none; }
+  .story-hero-brand img { width: 150px; height: auto; }
 }
 </style>
 </head>
 <body>
-
-<!-- ═══════════════════════════════════════ ELECTION STRIP ═══ -->
-
-<div class="election-strip">
-  <div class="es-item"><b>GBA Elections</b> · Mandated by Supreme Court</div>
-  <div class="es-dot"></div>
-  <div class="es-item">Notification deadline: <b>May 26, 2026</b></div>
-  <div class="es-dot"></div>
-  <div class="es-item">Election completion by: <b>June 30, 2026</b></div>
-  <div class="es-dot"></div>
-  <div class="es-item">Five corporations: <b>North · South · East · West · Central</b></div>
-</div>
 
 <!-- ═══════════════════════════════════════ DATA STORY ═══ -->
 
 <section class="story-section" id="story">
 
   <div class="story-hero">
+    <div class="story-hero-brand">
+      <img src="/logo.avif" alt="Propheus logo">
+    </div>
     <div class="story-hero-eyebrow">Where Bangalore's next government should invest</div>
     <h1 class="story-hero-headline">
       Bengaluru has <span class="red">bigger problems</span> than the heat, the traffic, and when the <span class="amber">Ejipura flyover</span> will finally be ready.
