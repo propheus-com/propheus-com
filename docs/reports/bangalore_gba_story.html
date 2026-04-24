@@ -1443,49 +1443,13 @@ footer b { color: rgba(255,255,255,0.8); }
     <!-- CHAPTER 6: THE DIGITAL ATLAS -->
     <div class="story-chapter animate-in">
       <div class="story-chapter-label">How we built this</div>
-      <h2 class="story-chapter-headline">The Digital Atlas: five datasets, one picture of a city.</h2>
-      <p class="story-chapter-body">For decades, urban planning in Bengaluru has been steered by data that was already out of date before the ink dried. The census runs every ten years. The last one was 2011. The city that shows up in those tables — its ward boundaries, its population counts, its facility records — no longer exists. Bengaluru has absorbed new towns, grown by millions in corridors that weren't mapped as distinct entities, and built entire residential ecosystems without commensurate civic infrastructure. The Digital Atlas was built to answer that question at scale: a living, ward-level picture of what Bengaluru looks like today, for the person trying to get to a hospital or put their child on a school bus — and for the government trying to figure out where to invest next.</p>
-      <div class="atlas-method-grid animate-in">
-        <div class="atlas-method-card">
-          <div class="atlas-method-num">01</div>
-          <div class="atlas-method-title">Overture Maps + OpenStreetMap</div>
-          <div class="atlas-method-desc">2,698 facility points — hospitals, clinics, schools, fire stations, police stations, parks — queried fresh from OSM Overpass. Completely independent of BBMP's own records, which allows cross-validation. When both sources agree, confidence is high. When they diverge, it flags a data gap worth investigating.</div>
-        </div>
-        <div class="atlas-method-card">
-          <div class="atlas-method-num">02</div>
-          <div class="atlas-method-title">BMTC GTFS Live Schedules</div>
-          <div class="atlas-method-desc">Bus stop locations and route frequencies pulled from the BMTC General Transit Feed Specification — the same data that powers Google Maps transit directions. This gives us not just where stops are, but whether routes are actually operating. A stop without a route is not access.</div>
-        </div>
-        <div class="atlas-method-card">
-          <div class="atlas-method-num">03</div>
-          <div class="atlas-method-title">WorldPop Population Estimates</div>
-          <div class="atlas-method-desc">High-resolution gridded population estimates at 100m resolution, derived from satellite imagery and census anchoring. Used to compute adjusted need — a ward with 120,000 residents and a large commercial daytime population has different infrastructure needs than one with the same residential count but no employment draw.</div>
-        </div>
-        <div class="atlas-method-card">
-          <div class="atlas-method-num">04</div>
-          <div class="atlas-method-title">ESA WorldCover + GHSL Built-Up</div>
-          <div class="atlas-method-desc">European Space Agency satellite land-cover data, updated to 2020, used to validate ward boundaries and identify built-up growth since 2000. Wards that have grown significantly since the Census 2011 boundary definitions are flagged — their population estimates and infrastructure needs are adjusted upward accordingly.</div>
-        </div>
-        <div class="atlas-method-card">
-          <div class="atlas-method-num">05</div>
-          <div class="atlas-method-title">URDPFI 2014 Norms as Benchmark</div>
-          <div class="atlas-method-desc">Every gap in this report is measured against India's own published planning standards — not an external or imported framework. The Ministry of Urban Development's Urban and Regional Development Plans Formulation and Implementation Guidelines (2014) specifies exactly how many schools, health centres, fire stations, and parks a ward of any given population should have. We simply counted what exists and compared it to what the government itself says should exist.</div>
-        </div>
-        <div class="atlas-method-card">
-          <div class="atlas-method-num">→</div>
-          <div class="atlas-method-title">Two-axis scoring, 369 wards</div>
-          <div class="atlas-method-desc">Each ward is scored two ways. First, peer-relative: how does this ward compare to other wards with similar population, area, and density? Second, absolute floor: does this ward meet URDPFI's minimum provisioning norm? A ward only scores high if both axes agree it has significant room to grow. This prevents a ward with average facilities from being flagged if its peers have similar levels — and surfaces the clearest investment opportunities even when they span the whole city.</div>
-        </div>
-      </div>
-      <div class="atlas-caveats animate-in">
-        <div class="atlas-caveat-title">Honest limitations</div>
-        <div class="atlas-caveat-grid">
-          <div class="atlas-caveat-item"><b>Water data: spatial pattern.</b> Census 2011 baselines used for water — the spatial pattern is consistent and confirmed by BWSSB's own city-wide figures.</div>
-          <div class="atlas-caveat-item"><b>Facility counts, not quality.</b> Two wards with the same count score the same regardless of facility size or quality. Quality assessment is the natural next step.</div>
-          <div class="atlas-caveat-item"><b>Ward boundaries are new.</b> GBA November 2025 delimitation (369 wards) — these are the boundaries used for June 2026 elections.</div>
-          <div class="atlas-caveat-item"><b>Fully auditable.</b> Every finding traces to a parquet file. The pipeline can be independently re-run and verified — by any government office, civic body, or researcher.</div>
-        </div>
-      </div>
+      <h2 class="story-chapter-headline">The Digital Atlas: Five Datasets, One Picture of a City</h2>
+      <p class="story-chapter-body">For decades, urban planning in Bengaluru has been shaped by data that is already out of date by the time it is put to use. The census runs every ten years. The last one was in 2011. But the Bengaluru reflected in those tables - its ward boundaries, population counts, facility records, and infrastructure assumptions - no longer represents the city that exists today.</p>
+      <p class="story-chapter-body">Since then, Bengaluru has expanded rapidly. It has absorbed new towns, grown by millions across corridors that were never mapped as distinct urban entities, and built entire residential ecosystems without a matching view of civic infrastructure around them.</p>
+      <p class="story-chapter-body">This is the gap Digital Atlas is designed to close: a living, ward-level picture of what Bengaluru looks like today - for the person trying to reach a hospital, put their child on a school bus, access a park, or rely on emergency services; and for the government, planners, and institutions trying to understand where investment is needed next.</p>
+      <p class="story-chapter-body">At its core, Digital Atlas is built to become the most comprehensive knowledge representation of every place on earth. It curates and connects real-world signals across location, topography, demographics, weather, mobility, public sentiment, traffic, and more to decode how places actually function.</p>
+      <p class="story-chapter-body">For this report, our AI Agents analyzed 2,600+ facility points across Bengaluru - including hospitals, clinics, schools, fire stations, police stations, and parks - and mapped the relationships between them to build a deeper, more contextual view of the city's civic infrastructure against India's urban development goals.</p>
+      <p class="story-chapter-body">To learn more or request a study for your city, reach out to signal@propheus.com.</p>
     </div>
 
   </div><!-- /story-content -->
