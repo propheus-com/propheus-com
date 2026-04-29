@@ -2,7 +2,6 @@
 
 import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import Link from 'next/link';
 
 function LoginForm() {
     const router = useRouter();
@@ -94,7 +93,7 @@ function LoginForm() {
                             <label className="block text-xs text-[#555] uppercase tracking-wider">Password</label>
                             <input
                                 type="password"
-                                autoComplete="new-password"
+                                autoComplete="off"
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
                                 required
@@ -120,12 +119,6 @@ function LoginForm() {
                     </button>
                 </form>
 
-                <p className="text-center mt-6 text-[#333] text-xs">
-                    First time?{' '}
-                    <Link href="/admin-portal/setup" className="text-[#008A89] hover:text-[#00a8a7] transition-colors">
-                        Run setup
-                    </Link>
-                </p>
             </div>
         </div>
     );
