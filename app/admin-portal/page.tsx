@@ -28,7 +28,7 @@ function LoginForm() {
             const res = await fetch('/api/admin/login', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username, password }),
+                body: JSON.stringify({ username: username.trim(), password: password.trim() }),
             });
             const data = await res.json();
             if (!res.ok) { setError(data.error ?? 'Login failed'); return; }
@@ -94,7 +94,7 @@ function LoginForm() {
                             <label className="block text-xs text-[#555] uppercase tracking-wider">Password</label>
                             <input
                                 type="password"
-                                autoComplete="current-password"
+                                autoComplete="new-password"
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
                                 required
