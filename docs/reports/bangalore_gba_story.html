@@ -867,6 +867,47 @@ body {
 .atlas-caveat-item { font-size: 13px; color: var(--ink-dim); line-height: 1.6; padding-left: 12px; border-left: 2px solid var(--rule); }
 .atlas-caveat-item b { color: var(--ink); font-weight: 500; }
 
+/* Chapter 6 prose layout */
+.atlas-intro {
+  max-width: 1000px;
+  margin-bottom: 24px;
+}
+
+.atlas-prose-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.atlas-prose-card {
+  background: var(--paper);
+  border: 1px solid var(--rule);
+  border-radius: 14px;
+  padding: 24px 22px;
+}
+
+.atlas-prose-card p {
+  font-size: 15px;
+  color: var(--ink-dim);
+  line-height: 1.8;
+}
+
+.atlas-prose-outro {
+  background: var(--ink);
+  border-radius: 14px;
+  padding: 24px 26px;
+  color: rgba(255,255,255,0.75);
+  font-size: 15px;
+  line-height: 1.8;
+  border-left: 3px solid #ff7b6e;
+}
+
+.atlas-prose-outro b {
+  color: #ffffff;
+  font-weight: 500;
+}
+
 footer {
   background: var(--ink);
   color: rgba(255,255,255,0.4);
@@ -940,6 +981,9 @@ footer b { color: rgba(255,255,255,0.8); }
   .mandate-title { font-size: 17px; }
   .mandate-desc { font-size: 14px; line-height: 1.65; }
   .atlas-method-grid { grid-template-columns: 1fr; }
+  .atlas-prose-grid { grid-template-columns: 1fr; }
+  .atlas-prose-card { padding: 20px 16px; }
+  .atlas-prose-outro { padding: 20px 16px; }
   .atlas-method-card { padding: 20px 16px; }
   .atlas-caveat-grid { grid-template-columns: 1fr; }
   .atlas-caveats { padding: 20px 16px 16px; }
@@ -1444,12 +1488,26 @@ footer b { color: rgba(255,255,255,0.8); }
     <div class="story-chapter animate-in">
       <div class="story-chapter-label">How we built this</div>
       <h2 class="story-chapter-headline">The Digital Atlas: Five Datasets, One Picture of a City</h2>
-      <p class="story-chapter-body">For decades, urban planning in Bengaluru has been shaped by data that is already out of date by the time it is put to use. The census runs every ten years. The last one was in 2011. But the Bengaluru reflected in those tables - its ward boundaries, population counts, facility records, and infrastructure assumptions - no longer represents the city that exists today.</p>
-      <p class="story-chapter-body">Since then, Bengaluru has expanded rapidly. It has absorbed new towns, grown by millions across corridors that were never mapped as distinct urban entities, and built entire residential ecosystems without a matching view of civic infrastructure around them.</p>
-      <p class="story-chapter-body">This is the gap Digital Atlas is designed to close: a living, ward-level picture of what Bengaluru looks like today - for the person trying to reach a hospital, put their child on a school bus, access a park, or rely on emergency services; and for the government, planners, and institutions trying to understand where investment is needed next.</p>
-      <p class="story-chapter-body">At its core, Digital Atlas is built to become the most comprehensive knowledge representation of every place on earth. It curates and connects real-world signals across location, topography, demographics, weather, mobility, public sentiment, traffic, and more to decode how places actually function.</p>
-      <p class="story-chapter-body">For this report, our AI Agents analyzed 2,600+ facility points across Bengaluru - including hospitals, clinics, schools, fire stations, police stations, and parks - and mapped the relationships between them to build a deeper, more contextual view of the city's civic infrastructure against India's urban development goals.</p>
-      <p class="story-chapter-body">To learn more or request a study for your city, reach out to signal@propheus.com.</p>
+      <div class="atlas-intro">
+        <p class="story-chapter-body">For decades, urban planning in Bengaluru has been shaped by data that is already out of date by the time it is put to use. The census runs every ten years. The last one was in 2011. But the Bengaluru reflected in those tables - its ward boundaries, population counts, facility records, and infrastructure assumptions - no longer represents the city that exists today.</p>
+      </div>
+      <div class="atlas-prose-grid animate-in">
+        <div class="atlas-prose-card">
+          <p>Since then, Bengaluru has expanded rapidly. It has absorbed new towns, grown by millions across corridors that were never mapped as distinct urban entities, and built entire residential ecosystems without a matching view of civic infrastructure around them.</p>
+        </div>
+        <div class="atlas-prose-card">
+          <p>This is the gap Digital Atlas is designed to close: a living, ward-level picture of what Bengaluru looks like today - for the person trying to reach a hospital, put their child on a school bus, access a park, or rely on emergency services; and for the government, planners, and institutions trying to understand where investment is needed next.</p>
+        </div>
+        <div class="atlas-prose-card">
+          <p>At its core, Digital Atlas is built to become the most comprehensive knowledge representation of every place on earth. It curates and connects real-world signals across location, topography, demographics, weather, mobility, public sentiment, traffic, and more to decode how places actually function.</p>
+        </div>
+        <div class="atlas-prose-card">
+          <p>For this report, our AI Agents analyzed 2,600+ facility points across Bengaluru - including hospitals, clinics, schools, fire stations, police stations, and parks - and mapped the relationships between them to build a deeper, more contextual view of the city's civic infrastructure against India's urban development goals.</p>
+        </div>
+      </div>
+      <div class="atlas-prose-outro animate-in">
+        To learn more or request a study for your city, reach out to <b>signal@propheus.com</b>.
+      </div>
     </div>
 
   </div><!-- /story-content -->
