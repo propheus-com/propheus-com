@@ -2,16 +2,13 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getSessionFromRequest } from '@/lib/session';
 
 const PROTECTED_PAGES = ['/admin-portal/dashboard', '/admin-portal/reports'];
-// /api/admin/login and /api/admin/bootstrap use their own auth mechanisms
-const UNPROTECTED_APIS = ['/api/admin/login', '/api/admin/bootstrap'];
 
 export async function middleware(request: NextRequest) {
     const { pathname } = request.nextUrl;
 
     const isProtectedPage = PROTECTED_PAGES.some((p) => pathname.startsWith(p));
     const isProtectedApi =
-        pathname.startsWith('/api/admin') &&
-        !UNPROTECTED_APIS.some((p) => pathname.startsWith(p));
+        pathname.startsWith('/api/admin') && pathname !== '/api/admin/login';
 
     if (!isProtectedPage && !isProtectedApi) {
         return NextResponse.next();
