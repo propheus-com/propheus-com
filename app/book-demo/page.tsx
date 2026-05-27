@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import Navbar from '@/components/Navbar';
 import Image from 'next/image';
+import { analytics } from '@/lib/analytics';
 
 declare global {
     interface Window {
@@ -30,6 +31,26 @@ export default function BookDemoPage() {
             setActiveTab('report');
         }
     }, []);
+
+    useEffect(() => {
+        const onHsMessage = (event: MessageEvent) => {
+            if (!event.data || event.data.type !== 'hsFormCallback') return;
+            const { eventName } = event.data as { eventName: string };
+            if (eventName === 'onFormSubmit') {
+                analytics.track('form_submitted', {
+                    form_id: `hubspot_${activeTab}`,
+                    page: window.location.pathname,
+                });
+            } else if (eventName === 'onFormSubmitted') {
+                analytics.track('form_submission_success', {
+                    form_id: `hubspot_${activeTab}`,
+                    page: window.location.pathname,
+                });
+            }
+        };
+        window.addEventListener('message', onHsMessage);
+        return () => window.removeEventListener('message', onHsMessage);
+    }, [activeTab]);
 
     useEffect(() => {
         const renderForm = () => {
@@ -135,13 +156,19 @@ export default function BookDemoPage() {
                             <div className="bd-tabs">
                                 <button
                                     className={`bd-tab ${activeTab === 'demo' ? 'active' : ''}`}
-                                    onClick={() => setActiveTab('demo')}
+                                    onClick={() => {
+                                        setActiveTab('demo');
+                                        analytics.track('cta_clicked', { cta_text: 'Book Demo', cta_id: 'tab-demo', page: window.location.pathname });
+                                    }}
                                 >
                                     Book Demo
                                 </button>
                                 <button
                                     className={`bd-tab ${activeTab === 'report' ? 'active' : ''}`}
-                                    onClick={() => setActiveTab('report')}
+                                    onClick={() => {
+                                        setActiveTab('report');
+                                        analytics.track('cta_clicked', { cta_text: 'Request Report', cta_id: 'tab-report', page: window.location.pathname });
+                                    }}
                                 >
                                     Request Report
                                 </button>
@@ -161,7 +188,11 @@ export default function BookDemoPage() {
                                     {activeTab === 'demo' ? 'Looking for insights?' : 'Want to see it in action?'}
                                 </span>
                                 <button
-                                    onClick={() => setActiveTab(activeTab === 'demo' ? 'report' : 'demo')}
+                                    onClick={() => {
+                                        const next = activeTab === 'demo' ? 'report' : 'demo';
+                                        setActiveTab(next);
+                                        analytics.track('cta_clicked', { cta_text: next === 'report' ? 'Request Report instead' : 'Book Demo instead', cta_id: 'tab-switch', page: window.location.pathname });
+                                    }}
                                     className="bd-switch-link"
                                 >
                                     {activeTab === 'demo' ? 'Request Report instead' : 'Book Demo instead'}

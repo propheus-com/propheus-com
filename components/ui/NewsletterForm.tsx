@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
+import { analytics } from '@/lib/analytics';
 
 const HS_PORTAL_ID = '242333258';
 const HS_FORM_ID   = '37e75a88-a672-4282-b8a0-ffe4d4729bbd';
@@ -14,12 +15,21 @@ export default function NewsletterForm({ dark = false }: { dark?: boolean }) {
     const [email,     setEmail]     = useState('');
     const [state,     setState]     = useState<State>('idle');
     const [errorMsg,  setErrorMsg]  = useState('');
+    const formStarted = useRef(false);
+
+    const onInputFocus = () => {
+        if (!formStarted.current) {
+            formStarted.current = true;
+            analytics.track('form_started', { form_id: 'newsletter', page: window.location.pathname });
+        }
+    };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!email) return;
         setState('loading');
         setErrorMsg('');
+        analytics.track('form_submitted', { form_id: 'newsletter', page: window.location.pathname });
 
         try {
             const res = await fetch(HS_ENDPOINT, {
@@ -43,14 +53,19 @@ export default function NewsletterForm({ dark = false }: { dark?: boolean }) {
                 setFirstname('');
                 setLastname('');
                 setEmail('');
+                analytics.track('form_submission_success', { form_id: 'newsletter', page: window.location.pathname });
             } else {
                 const body = await res.json().catch(() => ({}));
-                setErrorMsg(body?.message ?? 'Something went wrong. Please try again.');
+                const msg = body?.message ?? 'Something went wrong. Please try again.';
+                setErrorMsg(msg);
                 setState('error');
+                analytics.track('form_submission_failed', { form_id: 'newsletter', error: msg, page: window.location.pathname });
             }
         } catch {
-            setErrorMsg('Network error. Please check your connection and try again.');
+            const msg = 'Network error. Please check your connection and try again.';
+            setErrorMsg(msg);
             setState('error');
+            analytics.track('form_submission_failed', { form_id: 'newsletter', error: 'network_error', page: window.location.pathname });
         }
     };
 
@@ -97,6 +112,7 @@ export default function NewsletterForm({ dark = false }: { dark?: boolean }) {
                     aria-label="First name"
                     value={firstname}
                     onChange={e => setFirstname(e.target.value)}
+                    onFocus={onInputFocus}
                     className={dark ? 'newsletter-dark-input' : ''}
                     style={dark ? darkInputStyle : lightInputStyle}
                 />
@@ -106,6 +122,7 @@ export default function NewsletterForm({ dark = false }: { dark?: boolean }) {
                     aria-label="Last name"
                     value={lastname}
                     onChange={e => setLastname(e.target.value)}
+                    onFocus={onInputFocus}
                     className={dark ? 'newsletter-dark-input' : ''}
                     style={dark ? darkInputStyle : lightInputStyle}
                 />
@@ -127,6 +144,7 @@ export default function NewsletterForm({ dark = false }: { dark?: boolean }) {
                     required
                     value={email}
                     onChange={e => setEmail(e.target.value)}
+                    onFocus={onInputFocus}
                     className={dark ? 'newsletter-dark-input' : ''}
                     style={{
                         flex: 1, border: 'none', outline: 'none',
