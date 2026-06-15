@@ -12,6 +12,8 @@ import {
 import WorkflowStoryWidget from '@/components/sections/WorkflowStoryWidget';
 import RotatingText from '@/components/ui/RotatingText';
 import FloatingLines from '@/components/ui/FloatingLines';
+import RetailAgentSection from '@/components/sections/RetailAgentSection';
+import IndustryVisual from '@/components/sections/IndustryVisual';
 
 /* ---------------------------------------------------------------
    TABS (id lookup only)
@@ -297,18 +299,18 @@ function RetailPanel({ panelKey }: { panelKey: number }) {
                 <div className="rt-intro s-reveal" style={{ position: 'relative', zIndex: 1 }}>
                 <div className="rt-intro-left">
                     <h2 className="rt-heading">
-                        Retail AI that <em>acts,</em>
-                        <br />not reports.
+                        Plug into the Physical World
+                        <br /><em>Around Your Store</em>
                     </h2>
                     <p className="rt-body">
-                        Propheus' Retail AI Agent curates and analyzes real-world signals that matter for your stores - local events, competitor promos, weather - and delivers recommended actions for the next 14 days. Not dashboards. Decisions.
+                        Take action on millions of demand moments captured from around the physical world around your store - events around your store, competitor promotions, weather.
                     </p>
                     <div className="rt-intro-ctas">
-                        <Link href="/book-demo" className="rt-hire-cta">
-                            Hire the Agent <ArrowRight size={13} strokeWidth={2.5} />
-                        </Link>
-                        <Link href="/book-demo?tab=report" className="rt-report-cta">
-                            Request Your Report <ArrowRight size={13} strokeWidth={2.5} />
+                        <a href="#retail-observability" className="rt-hire-cta">
+                            See the Demo <ArrowRight size={13} strokeWidth={2.5} />
+                        </a>
+                        <Link href="/book-demo" className="rt-report-cta">
+                            Hire Your Agent <ArrowRight size={13} strokeWidth={2.5} />
                         </Link>
                     </div>
                 </div>
@@ -319,8 +321,7 @@ function RetailPanel({ panelKey }: { panelKey: number }) {
                             const Icon = sig.icon;
                             return (
                                 <div key={i} className="rt-sig-chip" style={{ animationDelay: `${i * 0.06}s` }}>
-                                    <span className="rt-sig-dot" style={{ background: sig.color }} />
-                                    <Icon size={11} style={{ color: sig.color }} />
+                                    <Icon size={13} strokeWidth={2} style={{ color: '#008a89' }} />
                                     <span>{sig.label}</span>
                                 </div>
                             );
@@ -330,6 +331,9 @@ function RetailPanel({ panelKey }: { panelKey: number }) {
                 </div>
             </div>
             </div>
+
+            {/* -- 1b. Retail Observability Agent (video + steps) -- */}
+            <RetailAgentSection accent="#008a89" ctaTextColor="#ffffff" />
 
             {/* -- 2. How it works -- */}
             <div className="rt-how s-reveal" data-navbar-dark>
@@ -347,6 +351,11 @@ function RetailPanel({ panelKey }: { panelKey: number }) {
                                 <p className="rt-cap-body">{cap.body}</p>
                             </div>
                         ))}
+                    </div>
+                    <div className="rt-how-cta-wrap">
+                        <Link href="/book-demo" className="rt-hire-cta">
+                            Hire Your Agent <ArrowRight size={13} strokeWidth={2.5} />
+                        </Link>
                     </div>
                 </div>
             </div>
@@ -564,7 +573,7 @@ const OTHER_INDUSTRIES: OtherIndustry[] = [
         tagline: 'Propheus Telecom Agent',
         headline: 'Signal intelligence,',
         headlineAccent: 'for the network era.',
-        description: 'Layer real-world signals onto retail and network performance to explain behaviour, prioritize expansion, and orchestrate outbound campaigns at scale.',
+        description: 'Your network footprint is alive with physical signals most engineering and commercial teams never see — micro-population surges, hyper-local weather events, a competitor launching an aggressive promo in your biggest market. Propheus fuses these real-world signals directly into your first-party data, giving your teams a concrete action plan they can execute long before the network feels the strain or churn spikes.',
         capabilities: [
             { title: 'Retail Insights',            body: 'Overlay real-world signals onto retail and network performance to explain why certain stores underperform or spike.' },
             { title: 'Retailer Selection',         body: 'Map current retail channel coverage against demand hotspots to identify opportunities for expansion with the Digital Atlas.' },
@@ -580,7 +589,69 @@ const OTHER_INDUSTRIES: OtherIndustry[] = [
 ];
 
 /* ---------------------------------------------------------------
-   OTHER INDUSTRY PANEL
+   UNIFIED INDUSTRY PANEL  (prefix: ip-)
+   Premium, consistent layout used for every non-retail industry.
+   Hero (copy + stat card) → capabilities grid.
+--------------------------------------------------------------- */
+
+function IndustryPanel({ industry, panelKey }: { industry: OtherIndustry; panelKey: number }) {
+    const { id, name, accent, tagline, headline, headlineAccent, description, capabilities } = industry;
+    const panelRef = useScrollReveal(panelKey);
+    return (
+        <div className="ip-root" ref={panelRef} style={{ '--ip-accent': accent } as React.CSSProperties}>
+            {/* HERO */}
+            <div className="ip-hero s-reveal">
+                <div className="ip-hero-left">
+                    <div className="ip-eyebrow">
+                        <span className="ip-ey-line" />
+                        {tagline}
+                    </div>
+                    <h2 className="ip-headline">
+                        {headline}<br />
+                        <em>{headlineAccent}</em>
+                    </h2>
+                    <p className="ip-desc">{description}</p>
+                    <div className="ip-hero-actions">
+                        <Link href="/book-demo" className="ip-cta">
+                            Request Early Access <ArrowRight size={14} strokeWidth={2.5} />
+                        </Link>
+                        <span className="ip-status">
+                            <span className="ip-status-dot" />
+                            Agent in Development
+                        </span>
+                    </div>
+                </div>
+
+                <div className="ip-hero-right">
+                    <IndustryVisual id={id} />
+                </div>
+            </div>
+
+            {/* CAPABILITIES */}
+            <div className="ip-caps s-reveal">
+                <div className="ip-caps-inner">
+                    <div className="ip-section-label">
+                        <span className="ip-sl-line" />
+                        Capabilities
+                    </div>
+                    <h3 className="ip-caps-h3">What the {name} Agent<br />will do for your team.</h3>
+                    <div className="ip-caps-grid">
+                        {capabilities.map((cap, i) => (
+                            <div key={i} className="ip-cap-card">
+                                <div className="ip-cap-num">{String(i + 1).padStart(2, '0')}</div>
+                                <h4 className="ip-cap-title">{cap.title}</h4>
+                                <p className="ip-cap-body">{cap.body}</p>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+}
+
+/* ---------------------------------------------------------------
+   OTHER INDUSTRY PANEL  (legacy — retained, no longer rendered)
 --------------------------------------------------------------- */
 
 function OtherPanel({ industry, panelKey }: { industry: OtherIndustry; panelKey: number }) {
@@ -929,10 +1000,19 @@ export default function IndustriesPage() {
         const hash = window.location.hash.replace('#', '');
         if (hash) {
             const idx = TABS.findIndex(t => t.id === hash);
-            if (idx !== -1) setActiveTab(idx);
+            if (idx !== -1) {
+                setActiveTab(idx);
+            } else if (hash === 'retail-observability') {
+                // Deep link to the retail agent section: open retail tab, then scroll
+                setActiveTab(0);
+                setTimeout(() => {
+                    const el = document.getElementById('retail-observability');
+                    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }, 250);
+            }
         }
 
-        // Listen for navbar-driven tab selection (e.g. clicking "RETAIL" in the navbar)
+        // Listen for navbar-driven tab selection (e.g. clicking "RETAIL OBSERVABILITY AGENT")
         const handleTabEvent = (e: Event) => {
             const detail = (e as CustomEvent).detail;
             if (detail?.tabId) {
@@ -940,13 +1020,20 @@ export default function IndustriesPage() {
                 if (idx !== -1) {
                     setActiveTab(idx);
                     window.history.replaceState(null, '', `#${detail.tabId}`);
+                    const scrollId = detail.scrollTo as string | undefined;
                     setTimeout(() => {
-                        const el = document.getElementById('ind2-panels');
+                        const el = scrollId
+                            ? document.getElementById(scrollId)
+                            : document.getElementById('ind2-panels');
                         if (el) {
-                            const top = el.getBoundingClientRect().top + window.scrollY - 32;
-                            window.scrollTo({ top, behavior: 'smooth' });
+                            if (scrollId) {
+                                el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                            } else {
+                                const top = el.getBoundingClientRect().top + window.scrollY - 32;
+                                window.scrollTo({ top, behavior: 'smooth' });
+                            }
                         }
-                    }, 100);
+                    }, 120);
                 }
             }
         };
@@ -1059,12 +1146,12 @@ export default function IndustriesPage() {
                 {/* CONTENT PANELS */}
                 <div className="ind2-panels" id="ind2-panels">
                     {activeTab === 0 && <RetailPanel panelKey={0} />}
-                    {activeTab === 1 && <CPGPanel panelKey={1} />}
-                    {activeTab === 2 && <O2OPanel panelKey={2} />}
-                    {activeTab === 3 && <TravelPanel panelKey={3} />}
-                    {activeTab === 4 && <OtherPanel industry={OTHER_INDUSTRIES[3]} panelKey={4} />}
-                    {activeTab === 5 && <OtherPanel industry={OTHER_INDUSTRIES[4]} panelKey={5} />}
-                    {activeTab === 6 && <OtherPanel industry={OTHER_INDUSTRIES[5]} panelKey={6} />}
+                    {activeTab === 1 && <IndustryPanel industry={OTHER_INDUSTRIES.find(i => i.id === 'cpg')!} panelKey={1} />}
+                    {activeTab === 2 && <IndustryPanel industry={OTHER_INDUSTRIES.find(i => i.id === 'o2o')!} panelKey={2} />}
+                    {activeTab === 3 && <IndustryPanel industry={OTHER_INDUSTRIES.find(i => i.id === 'travel')!} panelKey={3} />}
+                    {activeTab === 4 && <IndustryPanel industry={OTHER_INDUSTRIES.find(i => i.id === 'fintech')!} panelKey={4} />}
+                    {activeTab === 5 && <IndustryPanel industry={OTHER_INDUSTRIES.find(i => i.id === 'realestate')!} panelKey={5} />}
+                    {activeTab === 6 && <IndustryPanel industry={OTHER_INDUSTRIES.find(i => i.id === 'telecom')!} panelKey={6} />}
                 </div>
 
                 {/* FOOTER */}
@@ -1148,6 +1235,221 @@ export default function IndustriesPage() {
     opacity: 1;
     transform: translateY(0);
     will-change: auto;
+}
+
+/* --------------------------------------------------------------
+   UNIFIED INDUSTRY PANEL (ip-) — premium light editorial
+-------------------------------------------------------------- */
+.ip-root { background: #fafafa; color: #111; }
+
+.ip-hero {
+    display: grid;
+    grid-template-columns: 1.05fr 0.95fr;
+    gap: clamp(40px, 6vw, 88px);
+    align-items: center;
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: clamp(64px, 9vw, 132px) clamp(24px, 6vw, 80px);
+}
+.ip-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    font-family: var(--font-body);
+    font-size: 0.66rem;
+    font-weight: 700;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: var(--ip-accent, #008a89);
+    margin-bottom: 26px;
+}
+.ip-ey-line { width: 22px; height: 1.5px; background: var(--ip-accent, #008a89); display: inline-block; flex-shrink: 0; }
+.ip-headline {
+    font-family: var(--font-heading, 'Playfair Display', serif);
+    font-weight: 600;
+    font-size: clamp(2rem, 3.4vw, 3.1rem);
+    line-height: 1.12;
+    letter-spacing: -0.02em;
+    color: #111;
+    margin: 0 0 22px;
+}
+.ip-headline em { font-style: italic; color: var(--ip-accent, #008a89); }
+.ip-desc {
+    font-family: var(--font-body);
+    font-size: clamp(0.95rem, 1.15vw, 1.05rem);
+    line-height: 1.75;
+    color: #555;
+    margin: 0 0 36px;
+    max-width: 520px;
+}
+.ip-hero-actions { display: flex; align-items: center; gap: 22px; flex-wrap: wrap; }
+.ip-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 14px 26px;
+    border: 1.5px solid color-mix(in srgb, var(--ip-accent, #008a89) 45%, transparent);
+    border-radius: 10px;
+    background: transparent;
+    color: var(--ip-accent, #008a89);
+    font-family: var(--font-body);
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    text-decoration: none;
+    transition: background 0.22s, color 0.22s, transform 0.18s, box-shadow 0.25s;
+}
+.ip-cta:hover {
+    background: var(--ip-accent, #008a89);
+    color: #fff;
+    transform: translateY(-1px);
+    box-shadow: 0 10px 30px color-mix(in srgb, var(--ip-accent, #008a89) 28%, transparent);
+}
+.ip-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--font-body);
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    color: #9a9a9a;
+}
+.ip-status-dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--ip-accent, #008a89);
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--ip-accent, #008a89) 50%, transparent);
+    animation: ip-pulse 2s ease-out infinite;
+}
+@keyframes ip-pulse {
+    0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--ip-accent, #008a89) 45%, transparent); }
+    70% { box-shadow: 0 0 0 8px transparent; }
+    100% { box-shadow: 0 0 0 0 transparent; }
+}
+
+/* Stat card */
+.ip-hero-right { display: flex; justify-content: flex-end; }
+.ip-stat-card {
+    width: 100%;
+    max-width: 420px;
+    background: #ffffff;
+    border: 1px solid #ececec;
+    border-radius: 18px;
+    overflow: hidden;
+    box-shadow: 0 24px 64px rgba(0,0,0,0.06);
+}
+.ip-stat-card-head {
+    padding: 18px 26px;
+    border-bottom: 1px solid #f0f0f0;
+    background: #fbfbfb;
+}
+.ip-stat-card-label {
+    font-family: var(--font-body);
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: #aaa;
+}
+.ip-stat-row {
+    padding: clamp(22px, 2.6vw, 30px) 26px;
+    border-bottom: 1px solid #f3f3f3;
+    border-left: 2px solid transparent;
+    transition: border-left-color 0.25s, background 0.25s;
+}
+.ip-stat-row:last-child { border-bottom: none; }
+.ip-stat-row:hover { border-left-color: var(--ip-accent, #008a89); background: #fcfdfd; }
+.ip-stat-n {
+    font-family: var(--font-heading, 'Playfair Display', serif);
+    font-weight: 600;
+    font-size: clamp(2.1rem, 3.4vw, 2.9rem);
+    line-height: 1;
+    letter-spacing: -0.02em;
+    color: #111;
+}
+.ip-stat-desc {
+    font-family: var(--font-body);
+    font-size: 0.85rem;
+    color: #888;
+    margin-top: 8px;
+    line-height: 1.5;
+}
+
+/* Capabilities */
+.ip-caps { background: #ffffff; border-top: 1px solid #eee; }
+.ip-caps-inner {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: clamp(64px, 8vw, 120px) clamp(24px, 6vw, 80px);
+}
+.ip-section-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-family: var(--font-body);
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 0.26em;
+    text-transform: uppercase;
+    color: var(--ip-accent, #008a89);
+    margin-bottom: 20px;
+}
+.ip-sl-line { width: 24px; height: 1.5px; background: var(--ip-accent, #008a89); display: inline-block; }
+.ip-caps-h3 {
+    font-family: var(--font-heading, 'Playfair Display', serif);
+    font-weight: 600;
+    font-size: clamp(1.6rem, 2.6vw, 2.4rem);
+    line-height: 1.22;
+    letter-spacing: -0.02em;
+    color: #111;
+    margin: 0 0 clamp(36px, 5vw, 56px);
+    max-width: 640px;
+}
+.ip-caps-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: clamp(14px, 1.8vw, 22px);
+}
+.ip-cap-card {
+    padding: clamp(28px, 3vw, 38px);
+    border: 1px solid #ececec;
+    border-radius: 14px;
+    background: #fafafa;
+    transition: transform 0.28s cubic-bezier(0.22,1,0.36,1), box-shadow 0.28s, border-color 0.28s, background 0.28s;
+}
+.ip-cap-card:hover {
+    transform: translateY(-4px);
+    background: #fff;
+    border-color: color-mix(in srgb, var(--ip-accent, #008a89) 35%, #ececec);
+    box-shadow: 0 18px 44px rgba(0,0,0,0.07);
+}
+.ip-cap-num {
+    font-family: var(--font-heading, 'Playfair Display', serif);
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: color-mix(in srgb, var(--ip-accent, #008a89) 55%, #d8d8d8);
+    margin-bottom: 16px;
+}
+.ip-cap-title {
+    font-family: var(--font-body);
+    font-size: 1.02rem;
+    font-weight: 700;
+    color: #111;
+    margin: 0 0 10px;
+    letter-spacing: -0.01em;
+}
+.ip-cap-body {
+    font-family: var(--font-body);
+    font-size: 0.9rem;
+    line-height: 1.65;
+    color: #666;
+    margin: 0;
+}
+
+@media (max-width: 860px) {
+    .ip-hero { grid-template-columns: 1fr; gap: 40px; }
+    .ip-hero-right { justify-content: stretch; }
+    .ip-stat-card { max-width: none; }
 }
 
 .ind2-root {
@@ -1416,6 +1718,10 @@ export default function IndustriesPage() {
     transition: background .22s, transform .18s;
 }
 .rt-hire-cta:hover { background: #008a89; transform: translateY(-1px); }
+
+.rt-how-cta-wrap { margin-top: clamp(36px, 5vw, 56px); }
+.rt-how-cta-wrap .rt-hire-cta { background: #008a89; padding: 15px 30px; font-size: 10.5px; }
+.rt-how-cta-wrap .rt-hire-cta:hover { background: #00a5a4; box-shadow: 0 8px 28px rgba(0,138,137,0.3); }
 
 .rt-intro-ctas { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
 .rt-report-cta {

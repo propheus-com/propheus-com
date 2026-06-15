@@ -273,17 +273,17 @@ export default function Navbar() {
         }
     }, [isLandingPage, router]);
 
-    const handleRetail = useCallback(() => {
+    const handleRetailObservability = useCallback(() => {
         if (pathname === '/industries') {
-            // Already on industries page — trigger tab switch + scroll
+            // Already on industries page — switch to retail tab and scroll to the agent section
             window.history.replaceState(null, '', '#retail');
             window.dispatchEvent(
                 new CustomEvent('propheus:select-industry-tab', {
-                    detail: { tabId: 'retail' },
+                    detail: { tabId: 'retail', scrollTo: 'retail-observability' },
                 })
             );
         } else {
-            router.push('/industries#retail');
+            router.push('/industries#retail-observability');
         }
     }, [pathname, router]);
 
@@ -336,8 +336,8 @@ export default function Navbar() {
                             <Link href="/industries" className="navbar-link">
                                 INDUSTRIES
                             </Link>
-                            <button onClick={handleRetail} className="navbar-link">
-                                RETAIL
+                            <button onClick={handleRetailObservability} className="navbar-link">
+                                RETAIL OBSERVABILITY AGENT
                             </button>
                         </div>
                     </div>
@@ -378,9 +378,9 @@ export default function Navbar() {
                 <div className="navbar-drawer-divider" />
                 <button
                     className="navbar-drawer-link"
-                    onClick={() => { closeDrawer(); handleRetail(); }}
+                    onClick={() => { closeDrawer(); handleRetailObservability(); }}
                 >
-                    Retail
+                    Retail Observability Agent
                 </button>
                 <Link href="/book-demo" className="navbar-drawer-cta" onClick={closeDrawer}>
                     REQUEST ACCESS

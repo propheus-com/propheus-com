@@ -8,21 +8,21 @@ import AnalyticsProvider from '@/components/AnalyticsProvider';
 
 const inter = Inter({
     subsets: ['latin'],
-    variable: '--font-body',
+    variable: '--font-inter',
     weight: ['400', '500', '600'],
     display: 'swap',
 });
 
 const playfairDisplay = Playfair_Display({
     subsets: ['latin'],
-    variable: '--font-heading',
+    variable: '--font-playfair',
     weight: ['500', '600', '700'],
     display: 'swap',
 });
 
 const syne = Syne({
     subsets: ['latin'],
-    variable: '--font-display',
+    variable: '--font-syne',
     weight: ['600', '700', '800'],
     display: 'swap',
 });

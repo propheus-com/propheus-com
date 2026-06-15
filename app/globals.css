@@ -27,10 +27,15 @@
     --border-light: #e0e0e0;
     --border-subtle: #ebebeb;
 
-    /* Typography — values set by next/font CSS variables */
-    --font-heading: var(--font-heading), 'Playfair Display', serif;
-    --font-body: var(--font-body), 'Inter', sans-serif;
-    --font-display: var(--font-display), 'Syne', sans-serif;
+    /* Typography — next/font exposes --font-inter / --font-playfair / --font-syne;
+       these semantic aliases add literal fallbacks WITHOUT self-referencing
+       (a self-referencing custom property is a cyclic dependency and collapses
+       to an invalid value, which silently breaks every heading font).
+       NOTE: --font-display intentionally maps to the system ui-sans-serif stack
+       (Syne was dropped — the condensed display face read as "stretched"). */
+    --font-heading: var(--font-playfair), 'Playfair Display', serif;
+    --font-body: var(--font-inter), 'Inter', sans-serif;
+    --font-display: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
 
     /* Spacing System */
     --section-padding-x: 8vw;

@@ -97,7 +97,7 @@ export class PropheusExperience {
   private readonly LENIS_FRAME_START = 240;
   private readonly LENIS_FRAME_END = 240;
   private readonly LENIS_SCROLL_DISTANCE = 700; // px of scroll for 120 frames (≈2x faster than 1400)
-  private readonly LENIS_POST_BUFFER = 0; // no dead scroll — hero starts scrolling off immediately at 1:1
+  private readonly LENIS_POST_BUFFER = 120; // small hold so the fully-revealed text settles before the hero scrolls off
 
   // ========================================
   // SCROLL SENSITIVITY — accumulated delta
