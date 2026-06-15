@@ -3,6 +3,7 @@ import HeroExperience from '@/components/HeroExperience';
 import CaseStudySection from '@/components/sections/CaseStudySection';
 import DigitalAtlasSection from '@/components/sections/DigitalAtlasSection';
 import IndustrySection from '@/components/sections/IndustrySection';
+import RetailAgentSection from '@/components/sections/RetailAgentSection';
 import Image from 'next/image';
 import PagePreloader from '@/components/PagePreloader';
 import NewsletterForm from '@/components/ui/NewsletterForm';
@@ -19,18 +20,24 @@ export default function Home() {
             <Navbar />
             <HeroExperience />
 
-            {/* Section 1 — Digital Atlas (right after canvas shrink) */}
-            <div id="digital-atlas" style={{ paddingTop: 'clamp(80px, 12vw, 160px)' }}>
-                <DigitalAtlasSection />
-            </div>
+            {/* Breathing room below the hero's lenis subtext before the next section */}
+            <div aria-hidden="true" style={{ height: 'clamp(96px, 14vh, 180px)', background: '#ffffff' }} />
 
-            {/* Section 2 — Industry capabilities */}
+            {/* Section 1 — Industry capabilities */}
             <div id="industry-section">
                 <IndustrySection />
             </div>
 
-            {/* Section 3 — Case Studies */}
+            {/* Section 2 — Retail Observability Agent */}
+            <RetailAgentSection />
+
+            {/* Section 3 — Case Studies (proof in the real world) */}
             <CaseStudySection />
+
+            {/* Section 4 — Digital Atlas */}
+            <div id="digital-atlas">
+                <DigitalAtlasSection />
+            </div>
 
             {/* CTA Footer */}
             <footer

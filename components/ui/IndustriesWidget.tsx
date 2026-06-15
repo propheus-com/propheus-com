@@ -3,7 +3,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Store, ShoppingCart, Plane, Smartphone, ArrowRight } from 'lucide-react';
+import { Store, ShoppingCart, RadioTower, Smartphone, ArrowRight } from 'lucide-react';
 
 /**
  * Premium Industries / Partnerships Widget
@@ -35,11 +35,12 @@ const partnerships = [
     accent: '#3b82f6'
   },
   {
-    id: 'travel',
-    name: 'Travel',
-    image: '/assets/Industries/Travel.webp',
-    quote: "Use live context - crowds, events, weather, transit and venue status, and local price movements - to power physical observability, personalize discovery and recommendations, and drive dynamic pricing and smart bundling across flights, stays, and experiences.",
-    icon: Plane,
+    id: 'telecom',
+    name: 'Telecom',
+    // No dedicated Telecom image yet — reusing O2O artwork as a placeholder.
+    image: '/assets/Industries/O2O.webp',
+    quote: "Your network footprint is alive with physical signals most engineering and commercial teams never see. Sudden micro-population surges, live hyper-local weather events, or a competitor launching an aggressive promo in your biggest market—right now. Propheus fuses these real-world signals directly into your first-party data, giving your teams a concrete action plan they can execute - long before the network feels the strain or churn spikes.",
+    icon: RadioTower,
     accent: '#818cf8'
   },
   {

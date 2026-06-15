@@ -103,7 +103,7 @@ export default function HeroExperience() {
                         <StoreMapMarkers isMobile={isMobile} />
 
                         <h1 className="seg1-headline">
-                            <span className="seg1-line seg1-line-1">The Physical World</span>
+                            <span className="seg1-line seg1-line-1">The World</span>
                             <span className="seg1-line seg1-line-2">
                                 is your <span className="seg1-hero-word">Playground</span>
                             </span>
@@ -250,8 +250,8 @@ export default function HeroExperience() {
                             {/* Centre text block — word-level reveal driven by lenis progress */}
                             <div className="lenis-text-block">
                                 <LenisTextReveal
-                                    heading="Physical AI"
-                                    body="Reading the world is a completely different ballgame. You play it better with AI agents that understand the physical world in depth - the nature of places around you, how they evolve over time, local demographics, weather, movement patterns, consumer sentiment, competitor behavior, and much more."
+                                    heading="Plug into the Physical World"
+                                    body="Understand the physical world around you, and act on it, fast. Make smarter decisions based on continuously curated events, competitor activity, demographics, weather, people movement, and sentiment that affect your business."
                                 />
                             </div>
                         </div>
