@@ -21,11 +21,13 @@ export default function RetailAgentSection({
     ctaHref = '/book-demo',
     accent = '#29ffc9',
     ctaTextColor = '#070d0b',
+    videoSrc = '/retail-agent/demo.mp4',
 }: {
     id?: string;
     ctaHref?: string;
     accent?: string;
     ctaTextColor?: string;
+    videoSrc?: string;
 }) {
     return (
         <section id={id} className="ra-section" data-navbar-dark>
@@ -67,7 +69,7 @@ export default function RetailAgentSection({
                     <div className="ra-video-frame">
                         <video
                             className="ra-video"
-                            src="/retail-agent/demo.mp4"
+                            src={videoSrc}
                             autoPlay
                             muted
                             loop

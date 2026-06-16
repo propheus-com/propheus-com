@@ -354,8 +354,11 @@ export default function Navbar() {
                             className="navbar-hbg-inner"
                             duration={1.5}
                         >
-                            <span className="navbar-hbg-text">REQUEST ACCESS</span>
+                            <span className="navbar-hbg-text">BOOK A DEMO</span>
                         </HoverBorderGradient>
+                        <button onClick={handleRetailObservability} className="navbar-retail-btn">
+                            RETAIL OBSERVABILITY AGENT
+                        </button>
                     </div>
                     {/* Hamburger — visible only on mobile via CSS */}
                     <button
@@ -382,9 +385,16 @@ export default function Navbar() {
                 >
                     Retail Observability Agent
                 </button>
+                <div className="navbar-drawer-divider" />
                 <Link href="/book-demo" className="navbar-drawer-cta" onClick={closeDrawer}>
-                    REQUEST ACCESS
+                    BOOK A DEMO
                 </Link>
+                <button
+                    className="navbar-drawer-cta"
+                    onClick={() => { closeDrawer(); handleRetailObservability(); }}
+                >
+                    RETAIL OBSERVABILITY AGENT
+                </button>
             </div>
         </>
     );
