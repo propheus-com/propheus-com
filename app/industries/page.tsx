@@ -333,7 +333,7 @@ function RetailPanel({ panelKey }: { panelKey: number }) {
             </div>
 
             {/* -- 1b. Retail Observability Agent (video + steps) -- */}
-            <RetailAgentSection accent="#008a89" ctaTextColor="#ffffff" />
+            <RetailAgentSection accent="#008a89" ctaTextColor="#ffffff" videoSrc="/retail-agent/retail-pagedemo.mp4" />
 
             {/* -- 2. How it works -- */}
             <div className="rt-how s-reveal" data-navbar-dark>

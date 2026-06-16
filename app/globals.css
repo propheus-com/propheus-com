@@ -545,6 +545,33 @@ body.lenis-scroll-mode .site-navbar {
     z-index: 2;
 }
 
+/* ── Retail Observability Agent button ── */
+.navbar-retail-btn {
+    font-family: var(--font-body);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 0.6rem 1.3rem;
+    background: #008a89;
+    color: #ffffff;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background 0.22s, transform 0.25s var(--ease-smooth), box-shadow 0.25s var(--ease-smooth);
+}
+
+.navbar-retail-btn:hover {
+    background: #00a5a4;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 138, 137, 0.28);
+}
+
+.navbar-retail-btn:active {
+    transform: scale(0.97);
+}
+
 /* ============================================
    CLOUDS LAYER — above canvas, below pointers
    ============================================ */
