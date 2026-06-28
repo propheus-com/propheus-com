@@ -186,22 +186,22 @@ export default function WhitepaperPage() {
                 {/* ── RIGHT PANEL — FORM ── */}
                 <div className="wp-form-panel">
                     <div className="wp-form-outer wp-anim" style={{ animationDelay: '0.2s' }}>
-                        {/* Tangible whitepaper "cover" preview */}
+                        {/* Whitepaper cover preview — actual first page of the PDF */}
                         <div className="wp-cover-row">
-                            <div className="wp-cover" aria-hidden="true">
-                                <span className="wp-cover-eyebrow">Whitepaper</span>
-                                <span className="wp-cover-title">A Paradigm Shift in Telecom Economics</span>
-                                <span className="wp-cover-lines">
-                                    <i /><i /><i style={{ width: '60%' }} />
-                                </span>
-                                <span className="wp-cover-logo">PROPHEUS</span>
-                            </div>
+                            <Image
+                                src="/assets/references/telecom-whitepaper-cover.png"
+                                alt="A Paradigm Shift in Telecom Economics — whitepaper cover"
+                                width={132}
+                                height={187}
+                                className="wp-cover-img"
+                                priority
+                            />
                             <div className="wp-cover-meta">
                                 <span className="wp-cover-meta-kicker">Free report</span>
                                 <span className="wp-cover-meta-title">Telecom Economics</span>
                                 <span className="wp-cover-meta-detail">
                                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><polyline points="14 2 14 8 20 8" /></svg>
-                                    PDF &middot; APAC &middot; 2026
+                                    PDF &middot; APAC &middot; 2025&ndash;26
                                 </span>
                             </div>
                         </div>
@@ -507,60 +507,19 @@ export default function WhitepaperPage() {
     margin-bottom: 18px;
     padding-left: 4px;
 }
-.wp-cover {
-    position: relative;
+.wp-cover-img {
     flex-shrink: 0;
-    width: 96px;
-    aspect-ratio: 3 / 4;
+    width: 132px;
+    height: auto;
     border-radius: 8px;
-    padding: 14px 12px;
-    display: flex;
-    flex-direction: column;
-    background:
-        radial-gradient(120% 80% at 100% 0%, rgba(41,255,201,0.18), transparent 60%),
-        linear-gradient(160deg, #0e1a18 0%, #070d0c 100%);
-    border: 1px solid rgba(41,255,201,0.18);
-    box-shadow: 0 12px 28px rgba(7,13,12,0.32), 0 2px 6px rgba(7,13,12,0.2);
+    border: 1px solid rgba(0,0,0,0.08);
+    box-shadow: 0 14px 32px rgba(7,13,12,0.22), 0 3px 8px rgba(7,13,12,0.14);
     transform: rotate(-4deg);
-    transition: transform 0.3s cubic-bezier(0.22,1,0.36,1);
+    transition: transform 0.3s cubic-bezier(0.22,1,0.36,1), box-shadow 0.3s;
 }
-.wp-cover:hover { transform: rotate(-1deg) translateY(-2px); }
-.wp-cover-eyebrow {
-    font-family: var(--font-body, 'Inter', sans-serif);
-    font-size: 5.5px;
-    font-weight: 700;
-    letter-spacing: 0.22em;
-    text-transform: uppercase;
-    color: #29ffc9;
-    margin-bottom: 8px;
-}
-.wp-cover-title {
-    font-family: var(--font-heading, 'Playfair Display', serif);
-    font-size: 10px;
-    line-height: 1.2;
-    font-weight: 600;
-    color: #ffffff;
-    margin-bottom: auto;
-}
-.wp-cover-lines {
-    display: flex;
-    flex-direction: column;
-    gap: 3px;
-    margin: 10px 0;
-}
-.wp-cover-lines i {
-    display: block;
-    height: 2px;
-    width: 100%;
-    border-radius: 2px;
-    background: rgba(255,255,255,0.16);
-}
-.wp-cover-logo {
-    font-family: var(--font-body, 'Inter', sans-serif);
-    font-size: 5.5px;
-    font-weight: 700;
-    letter-spacing: 0.16em;
-    color: rgba(255,255,255,0.4);
+.wp-cover-img:hover {
+    transform: rotate(-1deg) translateY(-3px);
+    box-shadow: 0 20px 44px rgba(7,13,12,0.28), 0 4px 10px rgba(7,13,12,0.16);
 }
 .wp-cover-meta {
     display: flex;
@@ -787,8 +746,8 @@ export default function WhitepaperPage() {
     .wp-trust-row { gap: 12px; }
 }
 @media (max-width: 420px) {
-    .wp-cover-row { gap: 14px; }
-    .wp-cover { width: 80px; }
+    .wp-cover-row { gap: 16px; }
+    .wp-cover-img { width: 108px; }
     .wp-cover-meta-title { font-size: 16px; }
 }
             `}</style>
