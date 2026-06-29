@@ -27,8 +27,8 @@ const HS_PORTAL_ID = '242333258';
 const HS_FORM_ID = '99a3ca15-8fac-40aa-8065-63c7f093451c';
 
 /* ── Whitepaper PDF (lives in /public/assets/references) ── */
-const WHITEPAPER_URL = '/assets/references/Telecom White Paper June 2026 (1).pdf';
-const WHITEPAPER_FILENAME = 'Propheus-Telecom-Whitepaper-June-2026.pdf';
+const WHITEPAPER_URL = '/assets/references/Telecom in the Physical World Whitepaper.pdf';
+const WHITEPAPER_FILENAME = 'Propheus-Telecom-in-the-Physical-World-Whitepaper.pdf';
 
 const SECTIONS = [
     'Two Problems Telecom is Struggling to Solve — where to open next and who to win',
