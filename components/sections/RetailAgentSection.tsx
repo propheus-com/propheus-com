@@ -18,7 +18,7 @@ const STEPS = [
 
 export default function RetailAgentSection({
     id = 'retail-observability',
-    ctaHref = '/book-demo',
+    ctaHref = 'https://retail-observability.propheusagent.com/',
     accent = '#29ffc9',
     ctaTextColor = '#070d0b',
     videoSrc = '/retail-agent/demo.mp4',
@@ -59,9 +59,15 @@ export default function RetailAgentSection({
                         ))}
                     </div>
 
-                    <Link href={ctaHref} className="ra-cta" style={{ background: accent, color: ctaTextColor }}>
-                        Try Now for Free! <ArrowRight size={13} strokeWidth={2.5} />
-                    </Link>
+                    {/^https?:\/\//.test(ctaHref) ? (
+                        <a href={ctaHref} target="_blank" rel="noopener noreferrer" className="ra-cta" style={{ background: accent, color: ctaTextColor }}>
+                            Try Now for Free! <ArrowRight size={13} strokeWidth={2.5} />
+                        </a>
+                    ) : (
+                        <Link href={ctaHref} className="ra-cta" style={{ background: accent, color: ctaTextColor }}>
+                            Try Now for Free! <ArrowRight size={13} strokeWidth={2.5} />
+                        </Link>
+                    )}
                 </div>
 
                 {/* ── Right — product video ── */}

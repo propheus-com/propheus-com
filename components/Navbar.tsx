@@ -11,6 +11,9 @@ import Link from 'next/link';
 ═══════════════════════════════════════════════════════════════ */
 const DARK_SECTION_IDS = ['digital-atlas', 'industry-section', 'case-studies', 'cta-footer'];
 
+/* Live Retail Observability Agent app */
+const RETAIL_AGENT_URL = 'https://retail-observability.propheusagent.com/';
+
 export default function Navbar() {
     const navRef = useRef<HTMLElement>(null);
     const pathname = usePathname();
@@ -346,9 +349,14 @@ export default function Navbar() {
                         </Link>
                     </div>
                     <div className="navbar-right">
-                        <button onClick={handleRetailObservability} className="navbar-retail-btn">
+                        <a
+                            href={RETAIL_AGENT_URL}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="navbar-retail-btn"
+                        >
                             Access Retail Agent
-                        </button>
+                        </a>
                     </div>
                     {/* Hamburger — visible only on mobile via CSS */}
                     <button
@@ -376,12 +384,15 @@ export default function Navbar() {
                     Retail Observability Agent
                 </button>
                 <div className="navbar-drawer-divider" />
-                <button
+                <a
+                    href={RETAIL_AGENT_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="navbar-drawer-cta"
-                    onClick={() => { closeDrawer(); handleRetailObservability(); }}
+                    onClick={closeDrawer}
                 >
-                    RETAIL OBSERVABILITY AGENT
-                </button>
+                    ACCESS RETAIL AGENT
+                </a>
             </div>
         </>
     );
