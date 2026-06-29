@@ -150,9 +150,10 @@ export default function WhitepaperPage() {
                         </h1>
 
                         <p className="wp-sub wp-anim" style={{ animationDelay: '0.22s' }}>
-                            Telecom operators in APAC are rapidly adopting AI &mdash; but are missing
+                            Telecom operators in APAC are rapidly adopting AI, but are missing
                             out on two areas that secure long-term returns: where to build the next
-                            infrastructure, and who to target and win.
+                            infrastructure, and who to target and win. AI Agents bringing
+                            neighborhood-level intelligence to telecom decisions are changing this.
                         </p>
 
                         <div className="wp-toc-label wp-anim" style={{ animationDelay: '0.28s' }}>
