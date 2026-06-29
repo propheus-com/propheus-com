@@ -547,11 +547,14 @@ body.lenis-scroll-mode .site-navbar {
 
 /* ── Retail Observability Agent button ── */
 .navbar-retail-btn {
+    display: inline-flex;
+    align-items: center;
     font-family: var(--font-body);
     font-size: 0.72rem;
     font-weight: 700;
     letter-spacing: 0.08em;
     text-transform: uppercase;
+    text-decoration: none;
     padding: 0.6rem 1.3rem;
     background: #008a89;
     color: #ffffff;
